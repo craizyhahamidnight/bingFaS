@@ -122,13 +122,16 @@
   #result { display:none; margin-top:30px; font-size:17px; line-height:2; }
   #result p { margin-bottom:14px; }
 
-  #notebookBtn {
-    position:fixed; right:20px; bottom:20px;
+  #notebookBtn, #statsBtn {
+    position:fixed; right:20px;
     background:transparent; border:1px solid #4a3f32;
     color:#d4c9b8; padding:10px 18px;
     font-family:inherit; font-size:14px; cursor:pointer; z-index:60;
   }
-  #notebookBtn:hover { border-color:#8a7d6b; }
+  #notebookBtn { bottom:20px; }
+  #statsBtn { bottom:70px; }
+  #notebookBtn:hover, #statsBtn:hover { border-color:#8a7d6b; }
+
   #notebook {
     display:none; position:fixed; right:20px; bottom:70px;
     width:300px; max-height:400px; overflow-y:auto;
@@ -195,14 +198,14 @@
   }
 
   /* ========== NPC 面板 ========== */
-  #npcOverlay {
+  #npcOverlay, #statsOverlay {
     position:fixed; inset:0; z-index:150;
     background:rgba(0,0,0,0.65);
     display:none;
     align-items:center; justify-content:center;
     backdrop-filter: blur(2px);
   }
-  #npcPanel {
+  #npcPanel, #statsPanel {
     background:#1f1a14;
     border:1px solid #6a5a42;
     padding:28px 32px;
@@ -247,7 +250,7 @@
     width:30px; font-size:14px;
     text-align:right; font-weight:bold;
   }
-  #npcPanel .close-btn {
+  .close-btn {
     position:absolute;
     top:14px; right:18px;
     background:transparent; border:none;
@@ -255,11 +258,37 @@
     cursor:pointer; font-family:inherit;
     padding:0 6px;
   }
-  #npcPanel .close-btn:hover { color:#e8d5a8; }
+  .close-btn:hover { color:#e8d5a8; }
   #npcPanel .hint {
     color:#5a4f42; font-size:12px;
     margin-top:18px; text-align:center;
     letter-spacing:2px;
+  }
+
+  /* ========== 我的属性面板 ========== */
+  #statsPanel {
+    text-align:center;
+    padding:36px 32px 30px;
+  }
+  #statsPanel h3 {
+    color:#e8d5a8; font-size:22px;
+    margin-bottom:6px; letter-spacing:6px;
+    font-weight:normal;
+  }
+  #statsPanel .stats-title-sub {
+    color:#6a5a42; font-size:12px;
+    margin-bottom:26px; letter-spacing:3px;
+  }
+  #statsPanel .stats-desc {
+    color:#d4c9b8; font-size:18px;
+    line-height:2; padding:22px 4px;
+    border-top:1px dotted #332b22;
+    border-bottom:1px dotted #332b22;
+    margin-bottom:20px;
+  }
+  #statsPanel .stats-foot {
+    color:#5a4f42; font-size:12px;
+    letter-spacing:2px; font-style:italic;
   }
 </style>
 </head>
@@ -284,6 +313,7 @@
 
 <img id="heart" class="calm" src="https://cdn.phototourl.com/member/2026-11-02-36a5566b-457c-4986-b715-dc7cb965661d.png" alt="">
 
+<button id="statsBtn">我的属性</button>
 <button id="notebookBtn">军帐笔记</button>
 <div id="notebook">
   <h3>军帐笔记</h3>
@@ -302,6 +332,17 @@
     <div class="npc-desc" id="npcDesc"></div>
     <div id="npcStats"></div>
     <div class="hint">点击名字可随时查看</div>
+  </div>
+</div>
+
+<!-- 我的属性面板 -->
+<div id="statsOverlay">
+  <div id="statsPanel">
+    <button class="close-btn" id="statsClose">×</button>
+    <h3>在军民眼中</h3>
+    <div class="stats-title-sub">— 此乃他人眼中之你 —</div>
+    <div class="stats-desc" id="statsDesc"></div>
+    <div class="stats-foot">你的名声，会影响别人怎么算计你。</div>
   </div>
 </div>
 
@@ -417,6 +458,14 @@ const state = {
   notes: {},
   floatedTexts: [],
   currentRound: 1,
+  // 玩家属性
+  playerStats: {
+    智谋: 5,
+    胆识: 5,
+    统率: 5,
+    威望: 5,
+    果断: 5,
+  },
 };
 
 const bgm = document.getElementById('bgm');
@@ -502,6 +551,93 @@ function setHeartExcited(excited) {
   }
 }
 
+// ========== 玩家属性 ==========
+const STAT_NAMES = ['智谋','胆识','统率','威望','果断'];
+
+const STRONG_PHRASES = {
+  智谋: '军中都说你心思缜密',
+  胆识: '军中都说你敢下狠手',
+  统率: '你带兵有方',
+  威望: '军民都服你',
+  果断: '你做事从不拖泥带水',
+};
+
+const WEAK_PHRASES = {
+  智谋: '但有时想得不深',
+  胆识: '但遇大事有时迟疑',
+  统率: '但不太体恤士卒死活',
+  威望: '但底下人心里不太服',
+  果断: '但遇事容易犹豫',
+};
+
+function describePlayer(stats) {
+  const vals = STAT_NAMES.map(n => stats[n]);
+  const minV = Math.min(...vals);
+  const maxV = Math.max(...vals);
+  const allMid = (maxV - minV <= 1) && maxV <= 6 && minV >= 4;
+
+  if (allMid) return '一个平平无奇的守将，没有特别出彩的地方，也没有明显短板。';
+
+  const maxName = STAT_NAMES[vals.indexOf(maxV)];
+  const minName = STAT_NAMES[vals.indexOf(minV)];
+
+  const hasStrong = maxV >= 6;
+  const hasWeak = minV <= 4;
+
+  if (hasStrong && hasWeak && maxName !== minName) {
+    return STRONG_PHRASES[maxName] + '，' + WEAK_PHRASES[minName] + '。';
+  }
+  if (hasStrong) {
+    return STRONG_PHRASES[maxName] + '。';
+  }
+  if (hasWeak) {
+    return '说不上哪里好，' + WEAK_PHRASES[minName] + '。';
+  }
+  return '一个平平无奇的守将。';
+}
+
+function applyStatChanges(changes) {
+  if (!changes) return;
+  Object.entries(changes).forEach(([stat, delta]) => {
+    if (state.playerStats[stat] !== undefined) {
+      // 限制在 1-10 之间
+      state.playerStats[stat] = Math.max(1, Math.min(10, state.playerStats[stat] + delta));
+    }
+  });
+}
+
+// 根据属性调整胜率
+function calcWinChance(choice) {
+  let chance = choice.winChance !== undefined ? choice.winChance : 0.6;
+  if (choice.statBonus) {
+    Object.entries(choice.statBonus).forEach(([stat, bonus]) => {
+      const diff = (state.playerStats[stat] || 5) - 5;
+      chance += diff * bonus;
+    });
+  }
+  return Math.max(0.05, Math.min(0.95, chance));
+}
+
+// 我的属性面板
+const statsOverlay = document.getElementById('statsOverlay');
+const statsDesc = document.getElementById('statsDesc');
+
+function showStatsPanel() {
+  statsDesc.textContent = describePlayer(state.playerStats);
+  statsOverlay.style.display = 'flex';
+  // 关掉笔记，防止重叠
+  document.getElementById('notebook').style.display = 'none';
+  notebookOpen = false;
+}
+
+document.getElementById('statsBtn').onclick = showStatsPanel;
+document.getElementById('statsClose').onclick = () => {
+  statsOverlay.style.display = 'none';
+};
+statsOverlay.onclick = (e) => {
+  if (e.target === statsOverlay) statsOverlay.style.display = 'none';
+};
+
 // ========== 数据 ==========
 const gameContent = {
   round1: {
@@ -533,6 +669,7 @@ const gameContent = {
         betGood: 'B军南门撞墙，你反杀。',
         betBad: 'B军真打东门，东门三千对一万六，城破。',
         winChance: 0.6,
+        statChanges: { 胆识: 1, 统率: -1 },
         resultGood: 'B军夜袭南门，先头破门而入，你的预备队从巷子杀出，B先头被堵在城门洞里，死伤两千。B主将退兵，顺手烧了南门外民房，掩护撤退。',
         resultBad: 'B军主力猛攻东门。三千人守不住。城破了。你带着亲兵堵在城门洞里，长枪断了就用刀，刀卷了就用拳头。赵将军在你旁边倒下时还在喊"主将快走"。你没走。',
         death: true,
@@ -545,6 +682,7 @@ const gameContent = {
         betGood: 'B军无论打哪个门，你都能顶住。但兵力分散，打不疼B军。',
         betBad: 'B军集中兵力猛攻一门，你可能被消耗得很惨。',
         winChance: 0.6,
+        statChanges: { 统率: 1, 果断: -1 },
         resultGood: 'B军夜袭东门。东门六千人顶住了。B军退兵，你损失不大，但也没伤到B军筋骨。',
         resultBad: 'B军集中主力猛攻东门。东门六千人顶得很苦，你从南门调机动队支援，勉强守住。但伤亡很大。',
         death: false,
@@ -557,6 +695,7 @@ const gameContent = {
         betGood: '如果真是B军小股，你抓几个舌头，问出情报。',
         betBad: '如果是B军主力，两千人可能回不来。如果是空的，白折腾，士气下降。',
         winChance: 0.6,
+        statChanges: { 智谋: 1, 胆识: -1 },
         resultGood: '两千人摸到西边树林，抓了三个B军斥候。审出B军主力在南边，东门喊话是假的。',
         resultBad: '两千人走进树林，再也没回来。B军主力确实在西边。你少了2000人，还什么也没换到。',
         death: false,
@@ -584,6 +723,7 @@ const gameContent = {
         betGood: 'B军真去断水，你守住了水源。但城里少了四千人，B军主力可能趁机攻城。',
         betBad: 'B军是佯动，你白分兵。B军主力趁机猛攻，城里空虚。',
         winChance: 0.6,
+        statChanges: { 统率: 1, 智谋: -1 },
         resultGood: '四千人赶到上游，正好撞上B军偏师。打了一场硬仗，B军偏师退走。水坝保住了。但城里少了四千人，B军主力当天夜里试探性攻了一下东门，你勉强守住。',
         resultBad: '四千人到了水坝，什么都没发现。B军那三千人根本没去上游，就在半路等着。等你的四千人走远了，B军主力突然猛攻南门。你手里兵不够，南门差点破了，丢了三千人。',
         effectsGood: { troops: -800, food: -3 },
@@ -595,6 +735,7 @@ const gameContent = {
         betGood: 'B军确实是佯动，你不上当，B军白跑一趟。',
         betBad: 'B军真去断水，城里水源被掐。',
         winChance: 0.4,
+        statChanges: { 智谋: 1, 胆识: 1 },
         resultGood: '你按兵不动。三天后，老陈回报：那三千人走到半路又折回去了。B军白跑一趟。周先生松了口气，但随即皱眉："B军不会白跑。他一定在等什么。"',
         resultBad: '三天后，城里水井开始干。老陈跑来说上游水坝被B军占了，水流断了。城里存水只够三天。士兵开始偷水，有人为了一瓢水打架。周先生急了："主将，断水比断粮还狠。"',
         effectsGood: { troops: -100, food: -2 },
@@ -606,6 +747,7 @@ const gameContent = {
         betGood: 'B军真去断水，两千人据险而守，拖住B军偏师。你趁机派主力增援。',
         betBad: 'B军是佯动，你分了两千人出去，城里更空虚。',
         winChance: 0.6,
+        statChanges: { 智谋: 1, 果断: 1 },
         resultGood: '两千人赶到水坝，人少但据险而守。B军偏师三千人攻了半天攻不下来。你趁机派主力增援。B军偏师退走。水坝保住了，但两千人损失了一千二。',
         resultBad: '两千人到了水坝，什么都没发现。B军主力趁机攻城，你兵力更少，南门被撞开一个缺口，丢了一千五百人。',
         effectsGood: { troops: -1200, food: -4 },
@@ -645,12 +787,9 @@ function renderDialogue(lines) {
   });
 }
 
-// NPC 名字点击事件（事件委托）
 dialogueEl.addEventListener('click', (e) => {
   const target = e.target.closest('[data-npc]');
-  if (target) {
-    showNpcPanel(target.dataset.npc);
-  }
+  if (target) showNpcPanel(target.dataset.npc);
 });
 
 function showChoices(choices) {
@@ -743,7 +882,11 @@ function confirmBet(choice) {
   betPanelEl.style.display = 'none';
   betPanelEl.classList.remove('shake');
   setHeartExcited(false);
-  const win = Math.random() < (choice.winChance || 0.6);
+  // 应用属性变化
+  applyStatChanges(choice.statChanges);
+  // 计算胜率
+  const chance = calcWinChance(choice);
+  const win = Math.random() < chance;
   showResult(choice, win);
 }
 
@@ -845,6 +988,10 @@ document.getElementById('notebookBtn').onclick = () => {
   notebookOpen = !notebookOpen;
   document.getElementById('notebook').style.display = notebookOpen ? 'block' : 'none';
   renderNotebook();
+  if (notebookOpen) {
+    // 关掉属性面板，防止重叠
+    statsOverlay.style.display = 'none';
+  }
 };
 
 function renderNotebook() {
