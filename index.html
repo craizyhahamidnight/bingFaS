@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>青石城</title>
+<!-- 引入生成PDF的库 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
   body {
@@ -17,6 +20,7 @@
   body.warning { background:#2a1512; }
   body.danger { background:#3a0e0a; }
 
+  /* 开始界面 */
   #startScreen {
     position:fixed; inset:0; z-index:100;
     display:flex; flex-direction:column;
@@ -191,6 +195,7 @@
     border:1px solid #4a3f32; display:none;
   }
 
+  /* 面板基础 */
   #npcOverlay, #statsOverlay, #endingOverlay {
     position:fixed; inset:0; z-index:150; background:rgba(0,0,0,0.75);
     display:none; align-items:center; justify-content:center; backdrop-filter: blur(2px);
@@ -220,14 +225,35 @@
   #statsPanel .stats-desc { color:#d4c9b8; font-size:18px; line-height:2; padding:22px 4px; border-top:1px dotted #332b22; border-bottom:1px dotted #332b22; margin-bottom:20px; }
   #statsPanel .stats-foot { color:#5a4f42; font-size:12px; letter-spacing:2px; font-style:italic; }
 
+  /* 结局面板 */
   #endingPanel { text-align:center; padding:40px 36px 32px; }
   #endingPanel h2 { color:#e8d5a8; font-size:32px; margin-bottom:8px; letter-spacing:10px; font-weight:normal; }
   #endingPanel .ending-sub { color:#6a5a42; font-size:13px; margin-bottom:28px; letter-spacing:4px; }
   #endingPanel .ending-text { color:#d4c9b8; font-size:17px; line-height:2.1; text-align:left; margin-bottom:26px; padding:20px 0; border-top:1px dotted #332b22; border-bottom:1px dotted #332b22; }
   #endingPanel .ending-stats { color:#a89880; font-size:14px; line-height:1.9; text-align:left; margin-bottom:24px; }
   #endingPanel .ending-stats span { color:#c9a87a; }
-  #endingPanel .restart-btn { background:transparent; border:1px solid #8a7d6b; color:#c9b99a; padding:12px 40px; font-family:inherit; font-size:16px; letter-spacing:4px; cursor:pointer; transition:all 0.3s; }
-  #endingPanel .restart-btn:hover { background:#8a7d6b; color:#1a1714; }
+  
+  .end-btns { display: flex; gap: 15px; justify-content: center; }
+  .restart-btn, .pdf-btn { 
+    background:transparent; border:1px solid #8a7d6b; color:#c9b99a; 
+    padding:12px 30px; font-family:inherit; font-size:16px; letter-spacing:4px; 
+    cursor:pointer; transition:all 0.3s; 
+  }
+  .restart-btn:hover { background:#8a7d6b; color:#1a1714; }
+  .pdf-btn { border-color: #b85c4a; color: #e8b0a0; }
+  .pdf-btn:hover { background: #b85c4a; color: #1a1714; }
+
+  /* 隐藏的战报DOM，用于生成PDF */
+  #battleReport {
+    position: fixed; left: -9999px; top: 0;
+    width: 800px; background: #f4ebd8; color: #2b1e16;
+    padding: 50px; font-family: "KaiTi", "STKaiti", "楷体", serif;
+  }
+  #battleReport h1 { text-align: center; font-size: 36px; letter-spacing: 10px; border-bottom: 2px solid #2b1e16; padding-bottom: 20px; margin-bottom: 30px; }
+  #battleReport .report-meta { display: flex; justify-content: space-between; font-size: 18px; margin-bottom: 30px; }
+  #battleReport .report-log { font-size: 16px; line-height: 1.8; margin-bottom: 30px; }
+  #battleReport .report-log li { margin-bottom: 15px; border-bottom: 1px dashed #a89880; padding-bottom: 10px; }
+  #battleReport .report-ending { font-size: 20px; text-align: center; border-top: 2px solid #2b1e16; padding-top: 30px; margin-top: 30px; font-weight: bold; }
 </style>
 </head>
 <body>
@@ -299,8 +325,22 @@
     <div class="ending-sub" id="endingSub"></div>
     <div class="ending-text" id="endingText"></div>
     <div class="ending-stats" id="endingStats"></div>
-    <button class="restart-btn" onclick="location.reload()">再守一次</button>
+    <div class="end-btns">
+      <button class="pdf-btn" id="downloadPdfBtn">导出战报</button>
+      <button class="restart-btn" onclick="location.reload()">再守一次</button>
+    </div>
   </div>
+</div>
+
+<!-- 隐藏的战报DOM，专门给导出PDF用 -->
+<div id="battleReport">
+  <h1>青石城战报</h1>
+  <div class="report-meta">
+    <div>主将评价：<span id="pdfEval"></span></div>
+    <div>守城结果：<span id="pdfEnding"></span></div>
+  </div>
+  <ul class="report-log" id="pdfLog"></ul>
+  <div class="report-ending" id="pdfFooter"></div>
 </div>
 
 <audio id="bgm" loop preload="auto">
@@ -386,6 +426,8 @@ const state = {
   currentRound: 1,
   playerStats: { 智谋:5, 胆识:5, 统率:5, 威望:5, 果断:5 },
   noteKeys: {},
+  history: [], // 记录每一步的历史
+  finalEnding: ''
 };
 
 const bgm = document.getElementById('bgm');
@@ -813,6 +855,17 @@ function showResult(choice, win) {
   }
   resultEl.appendChild(p);
 
+  // 记录历史
+  state.history.push({
+    round: state.currentRound,
+    choice: choice.text,
+    win: win,
+    troops: state.troops,
+    food: state.food,
+    morale: state.morale,
+    civilMorale: state.civilMorale
+  });
+
   if (choice.death && !win) {
     const p2 = document.createElement('p');
     p2.className = 'thought';
@@ -950,7 +1003,7 @@ const gameContent = {
         text:'信赵将军：把七千预备队藏南门后巷，东门只留三千。赌B军声东击西。', 
         betGood:'B军南门撞墙，你反杀。', 
         betBad:'必死局！B军若真打东门，东门三千对一万六，城破人亡。', 
-        winChance:0.2, // 这里改成了 20% 存活率！
+        winChance:0.2, 
         statChanges:{ 胆识:1, 统率:-1 }, 
         resultGood:'B军夜袭南门，先头破门而入，你的预备队从巷子杀出，B先头被堵在城门洞里，死伤两千。B主将退兵，顺手烧了南门外民房，掩护撤退。', 
         resultBad:'B军主力猛攻东门。三千人守不住。城破了。你带着亲兵堵在城门洞里，长枪断了就用刀，刀卷了就用拳头。赵将军在你旁边倒下时还在喊"主将快走"。你没走。', 
@@ -1081,6 +1134,7 @@ function showEnding(forcedEnding) {
   } else {
     ending = '大胜';
   }
+  state.finalEnding = ending;
 
   const titles = { '城破被俘':'城 破', '惨胜':'惨 胜', '守住':'守 住', '大胜':'大 胜' };
   const subs = { '城破被俘':'青石城破，你被俘', '惨胜':'城守住了，但代价太大', '守住':'城还在，人还在', '大胜':'B军溃退，你赢了' };
@@ -1122,6 +1176,56 @@ function startGame(isGuided) {
 
 document.getElementById('startNormalBtn').onclick = () => startGame(false);
 document.getElementById('startGuideBtn').onclick = () => startGame(true);
+
+// ========== PDF 战报功能 ==========
+document.getElementById('downloadPdfBtn').onclick = () => {
+  const btn = document.getElementById('downloadPdfBtn');
+  const oldText = btn.textContent;
+  btn.textContent = '正在生成战报...';
+  btn.disabled = true;
+
+  // 1. 填充战报数据
+  document.getElementById('pdfEval').textContent = describePlayer(state.playerStats);
+  document.getElementById('pdfEnding').textContent = state.finalEnding;
+  
+  const logHtml = state.history.map(h => {
+    const resultStr = h.win ? '【胜】' : '【败】';
+    return `<li>
+      <b>第${h.round}轮：</b>${h.choice}<br>
+      <span style="color:${h.win ? '#2e7d32' : '#c62828'}">${resultStr}</span>
+      （战后余兵：${Math.max(0, h.troops)}人 | 粮草：${Math.max(0, h.food)}日 | 军心：${['稳','微乱','不稳','崩'][h.morale]} | 民心：${['稳','微乱','不稳','崩'][h.civilMorale]}）
+    </li>`;
+  }).join('');
+  document.getElementById('pdfLog').innerHTML = logHtml;
+  
+  document.getElementById('pdfFooter').textContent = `—— 守城结束，剩余兵力 ${Math.max(0, state.troops)} 人 ——`;
+
+  // 2. 生成图片并下载
+  const reportEl = document.getElementById('battleReport');
+  html2canvas(reportEl, {
+    scale: 2, // 提高清晰度
+    backgroundColor: '#f4ebd8'
+  }).then(canvas => {
+    const imgData = canvas.toDataURL('image/jpeg', 1.0);
+    const { jsPDF } = window.jspdf;
+    
+    // A4 尺寸：210 x 297 mm
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+    
+    pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+    pdf.save(`青石城战报_${state.finalEnding}.pdf`);
+    
+    btn.textContent = oldText;
+    btn.disabled = false;
+  }).catch(err => {
+    console.error('生成战报失败', err);
+    alert('生成战报失败，请重试。');
+    btn.textContent = oldText;
+    btn.disabled = false;
+  });
+};
 </script>
 </body>
 </html>
