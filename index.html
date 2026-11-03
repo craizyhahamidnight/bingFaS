@@ -17,13 +17,11 @@
   body.warning { background:#2a1512; }
   body.danger { background:#3a0e0a; }
 
-  /* 开始界面 */
   #startScreen {
     position:fixed; inset:0; z-index:100;
     display:flex; flex-direction:column;
     align-items:center; justify-content:center;
-    background:#1a1714;
-    gap:30px;
+    background:#1a1714; gap:30px;
   }
   #startScreen h1 {
     font-size:48px; letter-spacing:12px;
@@ -34,63 +32,50 @@
     margin-top:20px; padding:14px 48px;
     background:transparent; border:1px solid #8a7d6b;
     color:#c9b99a; font-size:20px; font-family:inherit;
-    cursor:pointer; letter-spacing:4px;
-    transition:all 0.3s;
+    cursor:pointer; letter-spacing:4px; transition:all 0.3s;
   }
   #startBtn:hover { background:#8a7d6b; color:#1a1714; }
 
-  /* 游戏主界面 */
-  #gameScreen {
-    display:none;
-    max-width:820px; margin:0 auto;
-    padding:40px 20px 120px;
-  }
+  #gameScreen { display:none; max-width:820px; margin:0 auto; padding:40px 20px 120px; }
 
-  /* 心脏 */
   #heart {
-    position:fixed;
-    left:30px; bottom:30px;
-    width:80px; height:80px;
-    z-index:50;
-    transition: filter 0.4s;
+    position:fixed; left:30px; bottom:30px;
+    width:80px; height:80px; z-index:50;
     transform-origin:center;
+    transition: filter 0.4s;
   }
   #heart.calm { filter:none; }
   #heart.excited { filter: hue-rotate(-20deg) saturate(1.6) brightness(1.1); }
 
-  /* 对话区 */
-  #dialogue {
-    font-size:18px; line-height:2;
-    margin-bottom:40px;
+  @keyframes pulseSmall {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.06); }
+    100% { transform: scale(1); }
   }
+  @keyframes pulseBig {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.18); }
+    100% { transform: scale(1); }
+  }
+
+  #dialogue { font-size:18px; line-height:2; margin-bottom:40px; }
   #dialogue p { margin-bottom:18px; }
   .speaker { color:#e8d5a8; }
   .narration { color:#a89880; font-style:italic; }
   .thought { color:#c9a87a; }
 
-  /* 选项区 */
   #choices { display:none; flex-direction:column; gap:14px; }
   .choice-btn {
-    background:transparent;
-    border:1px solid #4a3f32;
-    color:#d4c9b8;
-    padding:16px 20px;
-    font-family:inherit;
-    font-size:16px;
-    text-align:left;
-    cursor:pointer;
-    line-height:1.6;
-    transition:all 0.2s;
+    background:transparent; border:1px solid #4a3f32;
+    color:#d4c9b8; padding:16px 20px;
+    font-family:inherit; font-size:16px; text-align:left;
+    cursor:pointer; line-height:1.6; transition:all 0.2s;
   }
   .choice-btn:hover { border-color:#8a7d6b; background:#24201a; }
 
-  /* 赌局提示面板 */
   #betPanel {
-    display:none;
-    border:1px solid #6a5a42;
-    padding:20px;
-    margin-top:10px;
-    background:#1f1a14;
+    display:none; border:1px solid #6a5a42;
+    padding:20px; margin-top:10px; background:#1f1a14;
   }
   #betPanel .bet-title { color:#e8d5a8; margin-bottom:14px; font-size:16px; }
   #betPanel .bet-good { color:#7a9e7a; margin-bottom:8px; line-height:1.6; }
@@ -99,33 +84,27 @@
   .bet-action-btn {
     background:transparent; border:1px solid #4a3f32;
     color:#d4c9b8; padding:10px 24px;
-    font-family:inherit; font-size:15px; cursor:pointer;
-    transition:all 0.2s;
+    font-family:inherit; font-size:15px; cursor:pointer; transition:all 0.2s;
   }
   .bet-action-btn:hover { border-color:#8a7d6b; }
   .bet-action-btn.primary { border-color:#b85c4a; color:#e8b0a0; }
   .bet-action-btn.primary:hover { background:#b85c4a; color:#1a1714; }
 
-  /* 结果区 */
   #result { display:none; margin-top:30px; font-size:17px; line-height:2; }
   #result p { margin-bottom:14px; }
 
-  /* 笔记按钮和面板 */
   #notebookBtn {
     position:fixed; right:20px; bottom:20px;
     background:transparent; border:1px solid #4a3f32;
     color:#d4c9b8; padding:10px 18px;
-    font-family:inherit; font-size:14px; cursor:pointer;
-    z-index:60;
+    font-family:inherit; font-size:14px; cursor:pointer; z-index:60;
   }
   #notebookBtn:hover { border-color:#8a7d6b; }
   #notebook {
-    display:none;
-    position:fixed; right:20px; bottom:70px;
+    display:none; position:fixed; right:20px; bottom:70px;
     width:300px; max-height:400px; overflow-y:auto;
     background:#1f1a14; border:1px solid #4a3f32;
-    padding:18px; z-index:60;
-    font-size:14px; line-height:1.8;
+    padding:18px; z-index:60; font-size:14px; line-height:1.8;
   }
   #notebook h3 { color:#e8d5a8; font-size:16px; margin-bottom:12px; }
   #notebook table { width:100%; border-collapse:collapse; }
@@ -133,81 +112,61 @@
   #notebook td:first-child { color:#8a7d6b; width:40%; }
   .notebook-empty { color:#5a4f42; font-style:italic; }
 
-  /* 飘字 */
   .float-text {
-    position:fixed;
-    background:rgba(60,20,15,0.85);
-    border:1px solid #8a3a2a;
-    color:#e8c0a0;
-    padding:8px 14px;
-    font-size:14px;
-    cursor:pointer;
-    z-index:70;
-    opacity:0;
-    transition:opacity 0.8s, transform 0.8s;
-    line-height:1.6;
-    max-width:220px;
+    position:fixed; background:rgba(60,20,15,0.85);
+    border:1px solid #8a3a2a; color:#e8c0a0;
+    padding:8px 14px; font-size:14px; cursor:pointer;
+    z-index:70; opacity:0; transition:opacity 0.8s;
+    line-height:1.6; max-width:220px;
   }
   .float-text.show { opacity:0.75; }
   .float-text:hover { opacity:1; border-color:#b85c4a; }
   .float-text .full { display:none; margin-top:6px; color:#f0d8c0; font-size:13px; }
   .float-text.expanded .full { display:block; }
 
-  /* 记下按钮 */
   .record-btn {
-    display:inline-block;
-    margin-left:8px;
-    padding:2px 10px;
-    border:1px solid #4a3f32;
-    background:transparent;
-    color:#8a7d6b;
-    font-family:inherit;
-    font-size:12px;
-    cursor:pointer;
-    vertical-align:middle;
+    display:inline-block; margin-left:8px;
+    padding:2px 10px; border:1px solid #4a3f32;
+    background:transparent; color:#8a7d6b;
+    font-family:inherit; font-size:12px;
+    cursor:pointer; vertical-align:middle;
   }
   .record-btn:hover { border-color:#8a7d6b; color:#d4c9b8; }
   .record-btn.done { opacity:0.4; pointer-events:none; }
 
-  /* 红光边缘 */
   #redVignette {
     position:fixed; inset:0; pointer-events:none;
-    z-index:40; opacity:0;
-    transition:opacity 2s ease;
+    z-index:40; opacity:0; transition:opacity 2s ease;
     box-shadow: inset 0 0 120px 40px rgba(140,20,10,0.55);
   }
 
-  /* 教程提示 */
   #tutorialTip {
-    position:fixed;
-    bottom:120px; right:20px;
+    position:fixed; bottom:120px; right:20px;
     background:#2a2218; border:1px solid #6a5a42;
     padding:14px 18px; font-size:13px;
     color:#c9b99a; max-width:240px;
-    line-height:1.7; z-index:80;
-    display:none;
+    line-height:1.7; z-index:80; display:none;
   }
-  #tutorialTip::after {
-    content:''; position:absolute;
-    bottom:-8px; right:30px;
-    border-left:8px solid transparent;
-    border-right:8px solid transparent;
-    border-top:8px solid #6a5a42;
+
+  #audioStatus {
+    position:fixed; left:50%; top:16px; transform:translateX(-50%);
+    font-size:13px; color:#8a7d6b; z-index:90;
+    background:rgba(26,23,20,0.9); padding:6px 14px;
+    border:1px solid #4a3f32; display:none;
   }
 </style>
 </head>
 <body>
 
 <div id="redVignette"></div>
+<div id="audioStatus"></div>
 
-<!-- 开始界面 -->
 <div id="startScreen">
   <h1>青石城</h1>
   <p>你守的不是一座城，是一万个家。</p>
   <button id="startBtn">开始游戏</button>
 </div>
 
-<!-- 游戏界面 -->
 <div id="gameScreen">
   <div id="dialogue"></div>
   <div id="choices"></div>
@@ -215,10 +174,8 @@
   <div id="result"></div>
 </div>
 
-<!-- 心脏 -->
 <img id="heart" class="calm" src="https://cdn.phototourl.com/member/2026-11-02-36a5566b-457c-4986-b715-dc7cb965661d.png" alt="">
 
-<!-- 笔记 -->
 <button id="notebookBtn">军帐笔记</button>
 <div id="notebook">
   <h3>军帐笔记</h3>
@@ -226,19 +183,16 @@
   <p class="notebook-empty" id="notebookEmpty">尚无记录。</p>
 </div>
 
-<!-- 教程提示 -->
 <div id="tutorialTip">点击【记下】把数字记入笔记。<br>不记也不会死，但记混了别怪军师。</div>
 
-<!-- 音频 -->
-<audio id="bgm" loop>
+<audio id="bgm" loop preload="auto">
   <source src="https://videotourl.com/audio/1793641287845-340cdecb-ab47-41b7-8c76-e3c94fff6423.mp3" type="audio/mpeg">
 </audio>
-<audio id="heartbeatSfx">
+<audio id="heartbeatSfx" preload="auto">
   <source src="https://videotourl.com/audio/1793642652773-6f5ed6a8-121b-4d66-8073-256c842472f9.mp3" type="audio/mpeg">
 </audio>
 
 <script>
-// ========== 时间戳（音乐里的节奏点，单位：秒）==========
 const tickMarks = [
   0.021,0.811,2.453,2.699,3.787,4.320,5.920,6.731,7.019,7.829,
   8.107,8.629,9.419,17.205,18.027,19.648,19.915,21.515,22.325,
@@ -259,102 +213,86 @@ const tickMarks = [
   165.867,166.112,167.189,167.755
 ];
 
-// ========== 状态 ==========
 const state = {
-  round: 0,
   started: false,
   heartExcited: false,
-  decided: false, // 是否已经下注
-  rethought: false, // 是否点过"再想想"
-  forcedBet: false, // 是否强制下注
-  // 军心 0=稳 1=微乱 2=不稳 3=崩
+  forcedBet: false,
+  rethought: false,
   morale: 0,
-  // 数值
   troops: 12000,
   food: 40,
-  water: true,
-  gateEast: '完好',
   gateSouth: '完好',
-  gateNorth: '完好',
-  // 笔记
   notes: {},
-  // 已触发的飘字索引
   floatedTexts: [],
-  // 心跳缩放
-  heartScale: 1.0,
 };
 
-// ========== 音频 ==========
 const bgm = document.getElementById('bgm');
 const heartbeatSfx = document.getElementById('heartbeatSfx');
-let audioCtx = null;
+const heart = document.getElementById('heart');
+const audioStatus = document.getElementById('audioStatus');
 
-// 用 Web Audio API 精确获取 currentTime
-function initAudio() {
-  if (!audioCtx) {
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    // 把 audio 元素接入 AudioContext
-    const source = audioCtx.createMediaElementSource(bgm);
-    source.connect(audioCtx.destination);
-  }
-  audioCtx.resume();
-}
-
-// ========== 节奏检测 ==========
 let markIndex = 0;
 let lastBgmTime = 0;
 
+function showAudioStatus(msg) {
+  audioStatus.textContent = msg;
+  audioStatus.style.display = 'block';
+  setTimeout(() => { audioStatus.style.display = 'none'; }, 5000);
+}
+
+function startBgm() {
+  bgm.volume = 0.4;
+  const p = bgm.play();
+  if (p && p.catch) {
+    p.catch(err => {
+      showAudioStatus('背景音乐未能播放：' + err.name + '。请再点一次开始按钮。');
+    });
+  }
+}
+
 function checkTicks() {
-  if (!state.started || !bgm || bgm.paused) {
+  if (!state.started) {
     requestAnimationFrame(checkTicks);
     return;
   }
-  const t = bgm.currentTime;
-  // 检测循环：如果时间倒退了，说明循环回开头
-  if (t < lastBgmTime - 1) {
-    markIndex = 0;
+  if (!bgm.paused) {
+    const t = bgm.currentTime;
+    if (t < lastBgmTime - 1) {
+      markIndex = 0;
+    }
+    lastBgmTime = t;
+    while (markIndex < tickMarks.length && tickMarks[markIndex] <= t) {
+      onTick();
+      markIndex++;
+    }
   }
-  lastBgmTime = t;
-
-  // 找到当前时间之后最近的节奏点
-  while (markIndex < tickMarks.length && tickMarks[markIndex] <= t) {
-    onTick();
-    markIndex++;
-  }
-  // 如果所有节奏点都过了，等循环
   requestAnimationFrame(checkTicks);
 }
 
 function onTick() {
-  // 心脏跳动
   pulseHeart();
-  // 如果处于激动状态，播放心跳音效
   if (state.heartExcited) {
     playHeartbeatSfx();
   }
 }
 
 function pulseHeart() {
-  const heart = document.getElementById('heart');
-  const scaleMax = state.heartExcited ? 1.18 : 1.06;
-  heart.style.transition = 'transform 0.08s ease-out';
-  heart.style.transform = `scale(${scaleMax})`;
-  setTimeout(() => {
-    heart.style.transition = 'transform 0.18s ease-in';
-    heart.style.transform = 'scale(1)';
-  }, 80);
+  const anim = state.heartExcited ? 'pulseBig' : 'pulseSmall';
+  heart.style.animation = 'none';
+  void heart.offsetHeight;
+  heart.style.animation = anim + ' 0.25s ease-out';
 }
 
 function playHeartbeatSfx() {
-  if (!heartbeatSfx) return;
-  heartbeatSfx.currentTime = 0;
-  heartbeatSfx.volume = 0.6;
-  heartbeatSfx.play().catch(() => {});
+  try {
+    heartbeatSfx.currentTime = 0;
+    heartbeatSfx.volume = 0.6;
+    heartbeatSfx.play().catch(() => {});
+  } catch (e) {}
 }
 
 function setHeartExcited(excited) {
   state.heartExcited = excited;
-  const heart = document.getElementById('heart');
   if (excited) {
     heart.classList.remove('calm');
     heart.classList.add('excited');
@@ -366,9 +304,7 @@ function setHeartExcited(excited) {
   }
 }
 
-// ========== 游戏内容 ==========
 const gameContent = {
-  // 开场
   opening: [
     { type: 'narration', text: '青石城，城头。黄昏。' },
     { type: 'narration', text: '你站在城头，看着远处B军的营火。密密麻麻，从西边山脚一直铺到河边。风里有马粪和柴烟的味道。' },
@@ -380,8 +316,6 @@ const gameContent = {
     { type: 'speaker', name: '周先生', text: '赵将军，B军粮少，急攻是肯定的。但他喊东门，也可能是真打东门。东门墙矮，本来就该多放人。' },
     { type: 'speaker', name: '赵将军', text: '军师，您这话等于没说！' },
     { type: 'speaker', name: '周先生', text: '打仗的事，本来就没有十成十。' },
-    { type: 'narration', text: '你看着远处的营火，心里在盘算：' },
-    { type: 'thought', text: 'B军一万六，你一万二。B军粮草只够半个月，你够四十天。援军说十天到，已经过了七天，还没影。' },
     { type: 'speaker', name: '老陈', text: '主将，西边树林鸟群惊了，但天太黑，看不清是人还是野兽。' },
     { type: 'speaker', name: '周先生', text: '惊了几次？' },
     { type: 'speaker', name: '老陈', text: '三次。间隔不长。' },
@@ -392,7 +326,6 @@ const gameContent = {
     { type: 'narration', text: '你手按在城垛上，石头冰凉。' },
     { type: 'thought', text: '现在，你得做决定。' },
   ],
-  // 第一轮选项
   round1Choices: [
     {
       id: 'A',
@@ -430,7 +363,6 @@ const gameContent = {
   ],
 };
 
-// ========== 渲染 ==========
 const dialogueEl = document.getElementById('dialogue');
 const choicesEl = document.getElementById('choices');
 const betPanelEl = document.getElementById('betPanel');
@@ -441,7 +373,7 @@ function renderDialogue(lines) {
   lines.forEach(line => {
     const p = document.createElement('p');
     if (line.type === 'speaker') {
-      p.innerHTML = `<span class="speaker">${line.name}：</span>${line.text}`;
+      p.innerHTML = '<span class="speaker">' + line.name + '：</span>' + line.text;
     } else if (line.type === 'narration') {
       p.className = 'narration';
       p.textContent = line.text;
@@ -459,39 +391,31 @@ function showChoices(choices) {
   choices.forEach(c => {
     const btn = document.createElement('button');
     btn.className = 'choice-btn';
-    btn.textContent = `${c.id}. ${c.text}`;
+    btn.textContent = c.id + '. ' + c.text;
     btn.onclick = () => onChoiceClick(c);
     choicesEl.appendChild(btn);
   });
 }
 
-// ========== 选项交互 ==========
-let currentChoice = null;
-
 function onChoiceClick(choice) {
-  if (state.forcedBet) return; // 已经强制下注了
-  currentChoice = choice;
-  // 显示赌局面板
+  if (state.forcedBet) return;
   choicesEl.style.display = 'none';
   betPanelEl.style.display = 'block';
-  betPanelEl.innerHTML = `
-    <div class="bet-title">你确定吗？</div>
-    <div class="bet-good">如果赌对：${choice.betGood}</div>
-    <div class="bet-bad">如果赌错：${choice.betBad}</div>
-    <div class="bet-actions">
-      <button class="bet-action-btn primary" id="betConfirm">下注</button>
-      <button class="bet-action-btn" id="betThink">再想想</button>
-    </div>
-  `;
+  betPanelEl.innerHTML =
+    '<div class="bet-title">你确定吗？</div>' +
+    '<div class="bet-good">如果赌对：' + choice.betGood + '</div>' +
+    '<div class="bet-bad">如果赌错：' + choice.betBad + '</div>' +
+    '<div class="bet-actions">' +
+      '<button class="bet-action-btn primary" id="betConfirm">下注</button>' +
+      '<button class="bet-action-btn" id="betThink">再想想</button>' +
+    '</div>';
   document.getElementById('betConfirm').onclick = () => confirmBet(choice);
   document.getElementById('betThink').onclick = () => rethink(choice);
 }
 
-function rethink(choice) {
-  // 点过再想想，触发激动心跳
+function rethink() {
   state.rethought = true;
   setHeartExcited(true);
-  // 返回选项
   betPanelEl.style.display = 'none';
   choicesEl.style.display = 'flex';
 }
@@ -499,9 +423,7 @@ function rethink(choice) {
 function confirmBet(choice) {
   state.forcedBet = true;
   betPanelEl.style.display = 'none';
-  // 停止激动心跳
   setHeartExcited(false);
-  // 计算结果（60%概率赌对）
   const win = Math.random() < 0.6;
   showResult(choice, win);
 }
@@ -510,21 +432,16 @@ function showResult(choice, win) {
   resultEl.style.display = 'block';
   resultEl.innerHTML = '';
   const p = document.createElement('p');
+  p.className = 'narration';
   if (win) {
-    p.className = 'narration';
     p.textContent = choice.resultGood;
     applyEffects(choice.effectsGood);
   } else {
-    p.className = 'narration';
     p.textContent = choice.resultBad;
     applyEffects(choice.effectsBad);
-    if (choice.death) {
-      p.textContent += ' 城破了。';
-    }
   }
   resultEl.appendChild(p);
 
-  // 如果没死，显示后续
   if (!choice.death) {
     const p2 = document.createElement('p');
     p2.className = 'thought';
@@ -541,26 +458,22 @@ function showResult(choice, win) {
     p4.innerHTML = '周先生：<span>上游有水坝。B军想断水。</span>';
     resultEl.appendChild(p4);
 
-    // 这里先停，等后续扩展
     const p5 = document.createElement('p');
     p5.className = 'thought';
     p5.textContent = '（第二轮博弈待续——先试玩第一轮机制）';
     resultEl.appendChild(p5);
+
+    if (state.morale >= 1) {
+      spawnFloatTexts();
+    }
   } else {
-    // 死亡结局
     const p2 = document.createElement('p');
     p2.className = 'thought';
     p2.textContent = '你没有守住青石城。';
     resultEl.appendChild(p2);
   }
-
-  // 触发飘字（如果军心不稳）
-  if (state.morale >= 1) {
-    spawnFloatTexts();
-  }
 }
 
-// ========== 数值 ==========
 function applyEffects(effects) {
   if (!effects) return;
   if (effects.troops) state.troops += effects.troops;
@@ -573,9 +486,9 @@ function applyEffects(effects) {
 function updateRedVignette() {
   const v = document.getElementById('redVignette');
   const body = document.body;
+  body.classList.remove('warning', 'danger');
   if (state.morale === 0) {
     v.style.opacity = 0;
-    body.classList.remove('warning', 'danger');
   } else if (state.morale === 1) {
     v.style.opacity = 0.3;
     body.classList.add('warning');
@@ -588,7 +501,6 @@ function updateRedVignette() {
   }
 }
 
-// ========== 飘字 ==========
 const floatTextPool = [
   { frag: '……使者……马副将……', full: 'B军使者喊话的时候，马副将在后面笑了一下。笑得可得意了。' },
   { frag: '……水坝……表弟……夜里……人……', full: '上游水坝那边，我表弟守夜，说昨天夜里有人影晃，不止一个。' },
@@ -598,33 +510,30 @@ const floatTextPool = [
 ];
 
 function spawnFloatTexts() {
-  const available = floatTextPool.filter((_, i) => !state.floatedTexts.includes(i));
+  const available = floatTextPool
+    .map((item, i) => ({ item, i }))
+    .filter(x => !state.floatedTexts.includes(x.i));
   if (available.length === 0) return;
-  const idx = Math.floor(Math.random() * available.length);
-  const origIdx = floatTextPool.indexOf(available[idx]);
-  state.floatedTexts.push(origIdx);
-  const data = available[idx];
+  const pick = available[Math.floor(Math.random() * available.length)];
+  state.floatedTexts.push(pick.i);
+  const data = pick.item;
 
   const el = document.createElement('div');
   el.className = 'float-text';
-  el.style.left = (Math.random() * 60 + 10) + '%';
-  el.style.top = (Math.random() * 50 + 20) + '%';
-  el.innerHTML = `${data.frag}<div class="full">${data.full}</div>`;
+  el.style.left = (Math.random() * 55 + 10) + '%';
+  el.style.top = (Math.random() * 45 + 20) + '%';
+  el.innerHTML = data.frag + '<div class="full">' + data.full + '</div>';
   el.onclick = () => {
     el.classList.toggle('expanded');
-    if (el.classList.contains('expanded')) {
-      // 点开飘字，军心稍微稳住
-      if (state.morale > 0) {
-        state.morale = Math.max(0, state.morale - 1);
-        updateRedVignette();
-      }
+    if (el.classList.contains('expanded') && state.morale > 0) {
+      state.morale = Math.max(0, state.morale - 1);
+      updateRedVignette();
     }
   };
   document.body.appendChild(el);
   requestAnimationFrame(() => el.classList.add('show'));
 }
 
-// ========== 笔记 ==========
 const notebookTable = document.getElementById('notebookTable');
 const notebookEmpty = document.getElementById('notebookEmpty');
 let notebookOpen = false;
@@ -644,7 +553,7 @@ function renderNotebook() {
   }
   notebookEmpty.style.display = 'none';
   notebookTable.innerHTML = keys.map(k =>
-    `<tr><td>${k}</td><td>${state.notes[k]}</td></tr>`
+    '<tr><td>' + k + '</td><td>' + state.notes[k] + '</td></tr>'
   ).join('');
 }
 
@@ -653,57 +562,51 @@ function addNote(key, value) {
   renderNotebook();
 }
 
-// ========== 记下按钮 ==========
-function addRecordBtn(parentP, key, value) {
-  const btn = document.createElement('button');
-  btn.className = 'record-btn';
-  btn.textContent = '记下';
-  btn.onclick = () => {
-    addNote(key, value);
-    btn.textContent = '已记';
-    btn.classList.add('done');
-  };
-  parentP.appendChild(btn);
-}
-
-// ========== 开始游戏 ==========
 document.getElementById('startBtn').onclick = () => {
   document.getElementById('startScreen').style.display = 'none';
   document.getElementById('gameScreen').style.display = 'block';
   state.started = true;
 
-  // 启动音频
-  initAudio();
-  bgm.volume = 0.4;
-  bgm.play().catch(() => {});
-
-  // 开始节奏检测
+  startBgm();
   requestAnimationFrame(checkTicks);
 
-  // 教程提示
   setTimeout(() => {
     const tip = document.getElementById('tutorialTip');
     tip.style.display = 'block';
     setTimeout(() => { tip.style.display = 'none'; }, 6000);
   }, 2000);
 
-  // 渲染开场
   renderDialogue(gameContent.opening);
 
-  // 几秒后显示选项
   setTimeout(() => {
     showChoices(gameContent.round1Choices);
   }, 4000);
 
-  // 在对话里加记下按钮（兵力、粮草）
   setTimeout(() => {
-    const lastP = dialogueEl.lastElementChild;
     const infoP = document.createElement('p');
     infoP.className = 'thought';
     infoP.innerHTML = 'B军一万六，你一万二。B军粮草只够半个月，你够四十天。';
+    const btn1 = document.createElement('button');
+    btn1.className = 'record-btn';
+    btn1.textContent = '记下兵力';
+    btn1.onclick = () => {
+      addNote('我军兵力', '12000');
+      addNote('B军兵力', '16000');
+      btn1.textContent = '已记';
+      btn1.classList.add('done');
+    };
+    const btn2 = document.createElement('button');
+    btn2.className = 'record-btn';
+    btn2.textContent = '记下粮草';
+    btn2.onclick = () => {
+      addNote('我军粮草', '40日');
+      addNote('B军粮草', '约15日');
+      btn2.textContent = '已记';
+      btn2.classList.add('done');
+    };
+    infoP.appendChild(btn1);
+    infoP.appendChild(btn2);
     dialogueEl.appendChild(infoP);
-    addRecordBtn(infoP, '我军兵力', '12000');
-    addRecordBtn(infoP, '我军粮草', '40日');
   }, 3000);
 };
 </script>
