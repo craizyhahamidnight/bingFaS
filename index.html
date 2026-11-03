@@ -61,6 +61,15 @@
   #dialogue { font-size:18px; line-height:2; margin-bottom:40px; }
   #dialogue p { margin-bottom:18px; }
   .speaker { color:#e8d5a8; }
+  .speaker.clickable {
+    cursor:pointer;
+    border-bottom:1px dashed rgba(232,213,168,0.4);
+    transition:color 0.2s, border-color 0.2s;
+  }
+  .speaker.clickable:hover {
+    color:#f0e0b8;
+    border-bottom-color:#e8d5a8;
+  }
   .narration { color:#a89880; font-style:italic; }
   .thought { color:#c9a87a; }
 
@@ -184,6 +193,74 @@
     background:rgba(26,23,20,0.9); padding:6px 14px;
     border:1px solid #4a3f32; display:none;
   }
+
+  /* ========== NPC 面板 ========== */
+  #npcOverlay {
+    position:fixed; inset:0; z-index:150;
+    background:rgba(0,0,0,0.65);
+    display:none;
+    align-items:center; justify-content:center;
+    backdrop-filter: blur(2px);
+  }
+  #npcPanel {
+    background:#1f1a14;
+    border:1px solid #6a5a42;
+    padding:28px 32px;
+    max-width:420px; width:90%;
+    line-height:1.8;
+    box-shadow: 0 0 40px rgba(0,0,0,0.6);
+    position:relative;
+  }
+  #npcPanel h3 {
+    color:#e8d5a8; font-size:24px;
+    margin-bottom:6px; letter-spacing:4px;
+    font-weight:normal;
+  }
+  #npcPanel .npc-title {
+    color:#8a7d6b; font-size:13px;
+    margin-bottom:16px; letter-spacing:2px;
+  }
+  #npcPanel .npc-desc {
+    color:#a89880; font-size:15px;
+    margin-bottom:22px; font-style:italic;
+    line-height:1.9;
+    padding-bottom:18px;
+    border-bottom:1px dotted #332b22;
+  }
+  #npcPanel .stat-row {
+    display:flex; align-items:center;
+    margin-bottom:10px;
+  }
+  #npcPanel .stat-name {
+    width:60px; color:#8a7d6b; font-size:14px;
+    letter-spacing:1px;
+  }
+  #npcPanel .stat-bar {
+    flex:1; height:8px; background:#2a2218;
+    margin:0 12px; position:relative;
+    overflow:hidden;
+  }
+  #npcPanel .stat-fill {
+    height:100%; transition:width 0.3s ease;
+  }
+  #npcPanel .stat-val {
+    width:30px; font-size:14px;
+    text-align:right; font-weight:bold;
+  }
+  #npcPanel .close-btn {
+    position:absolute;
+    top:14px; right:18px;
+    background:transparent; border:none;
+    color:#8a7d6b; font-size:22px;
+    cursor:pointer; font-family:inherit;
+    padding:0 6px;
+  }
+  #npcPanel .close-btn:hover { color:#e8d5a8; }
+  #npcPanel .hint {
+    color:#5a4f42; font-size:12px;
+    margin-top:18px; text-align:center;
+    letter-spacing:2px;
+  }
 </style>
 </head>
 <body>
@@ -216,6 +293,18 @@
 
 <div id="tutorialTip">点击【记下】把数字记入笔记。<br>不记也不会死，但记混了别怪军师。</div>
 
+<!-- NPC 面板 -->
+<div id="npcOverlay">
+  <div id="npcPanel">
+    <button class="close-btn" id="npcClose">×</button>
+    <h3 id="npcName"></h3>
+    <div class="npc-title" id="npcTitle"></div>
+    <div class="npc-desc" id="npcDesc"></div>
+    <div id="npcStats"></div>
+    <div class="hint">点击名字可随时查看</div>
+  </div>
+</div>
+
 <audio id="bgm" loop preload="auto">
   <source src="https://videotourl.com/audio/1793641287845-340cdecb-ab47-41b7-8c76-e3c94fff6423.mp3" type="audio/mpeg">
 </audio>
@@ -244,6 +333,77 @@ const tickMarks = [
   165.867,166.112,167.189,167.755
 ];
 
+// ========== NPC 数据 ==========
+const npcData = {
+  '周先生': {
+    title: 'A军军师 · 姓周',
+    desc: '六十多岁，头发花白，走路拄拐。跟随老主将三十年，见过三场大战。说话慢，爱说"未必"。看起来什么都懂，但什么都不打包票。',
+    stats: { 智谋: 9, 胆识: 4, 统率: 7, 经验: 10, 忠诚: 9 }
+  },
+  '赵将军': {
+    title: 'A军年轻将领 · 姓赵',
+    desc: '三十出头，甲叶锃亮，嗓门大。老主将的外甥，从小在军营长大，没打过硬仗。想立功，急。周先生说往东，他偏想往西试试。',
+    stats: { 智谋: 3, 胆识: 9, 统率: 5, 经验: 3, 忠诚: 8 }
+  },
+  '老陈': {
+    title: 'A军斥候 · 猎户出身',
+    desc: '四十多岁，话少，眼睛毒。在青石城打了二十年猎，西边的树林他闭着眼都能走。他说"鸟惊了三次"，那就真是三次。但为什么惊，他说不准。',
+    stats: { 智谋: 5, 胆识: 6, 统率: 2, 经验: 9, 忠诚: 8 }
+  },
+  '副将李': {
+    title: 'A军副将 · 姓李',
+    desc: '四十岁，话不多，甲胄总是整整齐齐。跟了你十年，从伍长一路升到副将。你让他往东，他不问为什么。但偶尔事后会说一句"当时我觉得……"',
+    stats: { 智谋: 5, 胆识: 6, 统率: 8, 经验: 7, 忠诚: 10 }
+  },
+  '韩主将': {
+    title: 'B军主将 · 姓韩',
+    desc: '四十岁，多谋。少年时在边关打过十年仗，从死人堆里爬出来的。粮少，急，但急而不乱。他手下的兵服他，但也怕他。',
+    stats: { 智谋: 9, 胆识: 7, 统率: 9, 经验: 9, 忠诚: 6 }
+  },
+  '马副将': {
+    title: 'B军副将 · 姓马',
+    desc: '三十多岁，贪功。看不起A军，总觉得韩主将太小心。韩主将说什么他点头，转过头就跟部下嘀咕"换了我早打下来了"。',
+    stats: { 智谋: 4, 胆识: 8, 统率: 5, 经验: 4, 忠诚: 5 }
+  },
+};
+
+function getStatColor(v) {
+  if (v >= 8) return { color:'#d4a85a', fill:'#b8902a' };
+  if (v >= 5) return { color:'#a89880', fill:'#6a5a42' };
+  return { color:'#8a5a4a', fill:'#5a3a2a' };
+}
+
+const npcOverlay = document.getElementById('npcOverlay');
+const npcName = document.getElementById('npcName');
+const npcTitle = document.getElementById('npcTitle');
+const npcDesc = document.getElementById('npcDesc');
+const npcStats = document.getElementById('npcStats');
+
+function showNpcPanel(name) {
+  const npc = npcData[name];
+  if (!npc) return;
+  npcName.textContent = name;
+  npcTitle.textContent = npc.title;
+  npcDesc.textContent = npc.desc;
+  npcStats.innerHTML = Object.entries(npc.stats).map(([stat, val]) => {
+    const c = getStatColor(val);
+    return `<div class="stat-row">
+      <div class="stat-name">${stat}</div>
+      <div class="stat-bar"><div class="stat-fill" style="width:${val*10}%; background:${c.fill};"></div></div>
+      <div class="stat-val" style="color:${c.color};">${val}</div>
+    </div>`;
+  }).join('');
+  npcOverlay.style.display = 'flex';
+}
+
+document.getElementById('npcClose').onclick = () => {
+  npcOverlay.style.display = 'none';
+};
+npcOverlay.onclick = (e) => {
+  if (e.target === npcOverlay) npcOverlay.style.display = 'none';
+};
+
+// ========== 状态 ==========
 const state = {
   started: false,
   heartExcited: false,
@@ -291,9 +451,7 @@ function checkTicks() {
   }
   if (!bgm.paused) {
     const t = bgm.currentTime;
-    if (t < lastBgmTime - 1) {
-      markIndex = 0;
-    }
+    if (t < lastBgmTime - 1) markIndex = 0;
     lastBgmTime = t;
     while (markIndex < tickMarks.length && tickMarks[markIndex] <= t) {
       onTick();
@@ -304,9 +462,7 @@ function checkTicks() {
 }
 
 function onTick() {
-  if (!state.heartExcited) {
-    pulseHeart();
-  }
+  if (!state.heartExcited) pulseHeart();
 }
 
 function pulseHeart() {
@@ -326,12 +482,10 @@ function playHeartbeatSfx() {
 
 function setHeartExcited(excited) {
   state.heartExcited = excited;
-
   if (excited) {
     heart.classList.remove('calm');
     heart.classList.add('excited');
     heart.src = 'https://cdn.phototourl.com/member/2026-11-02-782fd5c5-d6e4-4606-89a4-db5b7451ba16.png';
-
     if (fastHeartbeatInterval) clearInterval(fastHeartbeatInterval);
     fastHeartbeatInterval = setInterval(() => {
       pulseHeart();
@@ -341,7 +495,6 @@ function setHeartExcited(excited) {
     heart.classList.remove('excited');
     heart.classList.add('calm');
     heart.src = 'https://cdn.phototourl.com/member/2026-11-02-36a5566b-457c-4986-b715-dc7cb965661d.png';
-
     if (fastHeartbeatInterval) {
       clearInterval(fastHeartbeatInterval);
       fastHeartbeatInterval = null;
@@ -478,7 +631,9 @@ function renderDialogue(lines) {
   lines.forEach(line => {
     const p = document.createElement('p');
     if (line.type === 'speaker') {
-      p.innerHTML = '<span class="speaker">' + line.name + '：</span>' + line.text;
+      const clickable = npcData[line.name] ? ' clickable' : '';
+      const nameHtml = `<span class="speaker${clickable}" data-npc="${line.name}">${line.name}</span>`;
+      p.innerHTML = nameHtml + '：' + line.text;
     } else if (line.type === 'narration') {
       p.className = 'narration';
       p.textContent = line.text;
@@ -489,6 +644,14 @@ function renderDialogue(lines) {
     dialogueEl.appendChild(p);
   });
 }
+
+// NPC 名字点击事件（事件委托）
+dialogueEl.addEventListener('click', (e) => {
+  const target = e.target.closest('[data-npc]');
+  if (target) {
+    showNpcPanel(target.dataset.npc);
+  }
+});
 
 function showChoices(choices) {
   choicesEl.style.display = 'flex';
@@ -502,13 +665,11 @@ function showChoices(choices) {
   });
 }
 
-// 滚动到底部才执行 callback
 function revealOnBottom(callback) {
   if (activeRevealHandler) {
     window.removeEventListener('scroll', activeRevealHandler);
     activeRevealHandler = null;
   }
-
   const reveal = () => {
     if (activeRevealHandler) {
       window.removeEventListener('scroll', activeRevealHandler);
@@ -517,28 +678,15 @@ function revealOnBottom(callback) {
     scrollHint.style.display = 'none';
     callback();
   };
-
   const atBottom = () => {
     const scrollBottom = window.scrollY + window.innerHeight;
     const docHeight = document.documentElement.scrollHeight;
     return scrollBottom >= docHeight - 100;
   };
-
-  activeRevealHandler = () => {
-    if (atBottom()) reveal();
-  };
-
+  activeRevealHandler = () => { if (atBottom()) reveal(); };
   setTimeout(() => {
-    // 如果页面本来就不需要滚动，直接显示
-    if (document.documentElement.scrollHeight <= window.innerHeight + 50) {
-      reveal();
-      return;
-    }
-    // 已经滚到底部了
-    if (atBottom()) {
-      reveal();
-      return;
-    }
+    if (document.documentElement.scrollHeight <= window.innerHeight + 50) { reveal(); return; }
+    if (atBottom()) { reveal(); return; }
     scrollHint.style.display = 'block';
     window.addEventListener('scroll', activeRevealHandler);
   }, 200);
@@ -556,9 +704,7 @@ function onChoiceClick(choice) {
   currentChoice = choice;
   choicesEl.style.display = 'none';
   betPanelEl.style.display = 'block';
-
   const locked = state.rethought;
-
   betPanelEl.innerHTML =
     '<div class="bet-title">你确定吗？</div>' +
     '<div class="bet-good">如果赌对：' + choice.betGood + '</div>' +
@@ -568,7 +714,6 @@ function onChoiceClick(choice) {
       '<button class="bet-action-btn' + (locked ? ' locked' : '') + '" id="betThink">再想想</button>' +
     '</div>' +
     '<div id="warningMsg">主帅，请做出决定！！！</div>';
-
   document.getElementById('betConfirm').onclick = () => confirmBet(choice);
   document.getElementById('betThink').onclick = () => {
     if (state.rethought) {
@@ -583,13 +728,6 @@ function onChoiceClick(choice) {
       rethink();
     }
   };
-
-  // 滚到底部时，如果已经再想想过了，提示还没出现的话显示一下
-  setTimeout(() => {
-    if (state.rethought && !locked) {
-      // 理论上不会发生
-    }
-  }, 100);
 }
 
 function rethink() {
@@ -631,12 +769,8 @@ function showResult(choice, win) {
     return;
   }
 
-  // 飘字
-  if (state.morale >= 1) {
-    spawnFloatTexts();
-  }
+  if (state.morale >= 1) spawnFloatTexts();
 
-  // 滚动到底部显示"继续"
   revealOnBottom(() => {
     const contBtn = document.createElement('button');
     contBtn.className = 'bet-action-btn primary';
@@ -665,18 +799,10 @@ function updateRedVignette() {
   const v = document.getElementById('redVignette');
   const body = document.body;
   body.classList.remove('warning', 'danger');
-  if (state.morale === 0) {
-    v.style.opacity = 0;
-  } else if (state.morale === 1) {
-    v.style.opacity = 0.3;
-    body.classList.add('warning');
-  } else if (state.morale === 2) {
-    v.style.opacity = 0.6;
-    body.classList.add('danger');
-  } else {
-    v.style.opacity = 0.9;
-    body.classList.add('danger');
-  }
+  if (state.morale === 0) v.style.opacity = 0;
+  else if (state.morale === 1) { v.style.opacity = 0.3; body.classList.add('warning'); }
+  else if (state.morale === 2) { v.style.opacity = 0.6; body.classList.add('danger'); }
+  else { v.style.opacity = 0.9; body.classList.add('danger'); }
 }
 
 const floatTextPool = [
@@ -695,7 +821,6 @@ function spawnFloatTexts() {
   const pick = available[Math.floor(Math.random() * available.length)];
   state.floatedTexts.push(pick.i);
   const data = pick.item;
-
   const el = document.createElement('div');
   el.className = 'float-text';
   el.style.left = (Math.random() * 55 + 10) + '%';
@@ -740,7 +865,6 @@ function addNote(key, value) {
   renderNotebook();
 }
 
-// ========== 回合流程 ==========
 function playRound(roundNum) {
   state.currentRound = roundNum;
   state.forcedBet = false;
@@ -749,7 +873,6 @@ function playRound(roundNum) {
 
   if (roundNum === 1) {
     renderDialogue(gameContent.round1.intro);
-    // 加记录按钮段落
     const infoP = document.createElement('p');
     infoP.className = 'thought';
     infoP.innerHTML = 'B军一万六，你一万二。B军粮草只够半个月，你够四十天。';
@@ -779,15 +902,12 @@ function playRound(roundNum) {
       showChoices(gameContent.round1.choices);
       showTutorialTip();
     });
-
   } else if (roundNum === 2) {
     renderDialogue(gameContent.round2.intro);
     revealOnBottom(() => {
       showChoices(gameContent.round2.choices);
     });
-
   } else {
-    // 第三轮待续
     renderDialogue([
       { type: 'narration', text: '（第三轮博弈待续——先试玩前两轮机制）' },
     ]);
@@ -795,15 +915,12 @@ function playRound(roundNum) {
   }
 }
 
-// ========== 开始游戏 ==========
 document.getElementById('startBtn').onclick = () => {
   document.getElementById('startScreen').style.display = 'none';
   document.getElementById('gameScreen').style.display = 'block';
   state.started = true;
-
   startBgm();
   requestAnimationFrame(checkTicks);
-
   playRound(1);
 };
 </script>
