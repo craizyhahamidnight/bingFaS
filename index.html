@@ -7,7 +7,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
-  /* CSS 完全保持原样 */
   * { margin:0; padding:0; box-sizing:border-box; }
   body {
     background:#1a1714; color:#d4c9b8; font-family:"KaiTi","STKaiti","楷体",serif;
@@ -292,7 +291,7 @@
   <div id="interludePanel">
     <h2>战后休整</h2>
     <div class="stats-exp" id="intExp" style="margin-bottom:20px;">经验：0　心气：0</div>
-    <p class="int-desc">B军退去，青石城迎来了短暂的安宁。伤兵在营中哀嚎，活下来的人在修补城墙。<br>百姓们送来了一些粗粮，军心和民心正在缓慢恢复。<br>请选择接下来的行动：</p>
+    <p class="int-desc">B军退去，后方援军终于赶到，补充了兵员与粮草。城墙连夜修缮，百姓们也终于松了一口气。<br>（无论前一场战役损失多重，只要活下来，青石城就能重整旗鼓。全军状态已恢复。）<br>请选择接下来的行动：</p>
     <div class="campaign-list">
       <button class="campaign-btn" id="btn-chase">追击战：穷寇莫追<small>痛打落水狗，但小心困兽犹斗。</small></button>
       <button class="campaign-btn" id="btn-food">夺粮战：断其命脉<small>（军情司正在加急编写战报，暂未解锁）</small></button>
@@ -954,7 +953,6 @@ const campaignContent = {
       ]
     }
   },
-  // 空位占位，因为 UI 锁住了
   'food': { name: '夺粮战', 1: {}, 2: {}, 3: {} },
   'court': { name: '朝堂战', 1: {}, 2: {}, 3: {} }
 };
@@ -1015,10 +1013,8 @@ function triggerEnding(forced = '') {
       document.getElementById('endingOverlay').style.display = 'none';
       state.phase = 'interlude';
       
-      // 修复1：休整期恢复军心/民心
-      if (state.act1.morale > 0) state.act1.morale -= 1;
-      if (state.act1.civilMorale > 0) state.act1.civilMorale -= 1;
-      // 修复2：清除红光
+      // 全新逻辑：第一幕结束，直接恢复所有状态
+      state.act1 = initStage(); 
       updateRedVignette();
 
       openInterlude();
@@ -1029,9 +1025,7 @@ function triggerEnding(forced = '') {
       btn.onclick = () => {
         document.getElementById('endingOverlay').style.display = 'none';
         state.camp = initStage();
-        state.camp.troops = 10000;
-        state.camp.food = 30;
-        updateRedVignette(); // 清除红光
+        updateRedVignette();
         playRound(1);
       };
     } else {
@@ -1041,10 +1035,8 @@ function triggerEnding(forced = '') {
         document.getElementById('endingOverlay').style.display = 'none';
         state.phase = 'interlude';
         
-        // 修复1：休整期恢复军心/民心
-        if (state.camp.morale > 0) state.camp.morale -= 1;
-        if (state.camp.civilMorale > 0) state.camp.civilMorale -= 1;
-        // 修复2：清除红光
+        // 战役结束，恢复所有状态
+        state.camp = initStage();
         updateRedVignette();
 
         openInterlude();
@@ -1065,7 +1057,6 @@ function openInterlude() {
       btn.disabled = true;
       btn.innerHTML = `已通关<small>此战役已平定。</small>`;
     } else {
-      // 锁定另外两个战役
       if (key === 'food' || key === 'court') {
         btn.disabled = true;
         btn.innerHTML = `${campaignContent[key].name}${key === 'food' ? '：断其命脉' : '：后院起火'}<small>（军情司正在加急编写战报，暂未解锁）</small>`;
@@ -1089,9 +1080,9 @@ function startCampaign(key) {
   document.getElementById('interludeOverlay').style.display = 'none';
   state.phase = 'campaign';
   state.currentCampaign = key;
+  
+  // 开始新战役，重置满状态
   state.camp = initStage();
-  state.camp.troops = 10000;
-  state.camp.food = 30;
   
   playRound(1);
 }
