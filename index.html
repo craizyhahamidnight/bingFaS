@@ -17,59 +17,49 @@
   body.warning { background:#2a1512; }
   body.danger { background:#3a0e0a; }
 
+  /* 开始界面 */
   #startScreen {
     position:fixed; inset:0; z-index:100;
     display:flex; flex-direction:column;
     align-items:center; justify-content:center;
-    background:#1a1714; gap:30px;
+    background:#1a1714; gap:20px;
   }
   #startScreen h1 {
     font-size:48px; letter-spacing:12px;
-    color:#c9b99a; font-weight:normal;
+    color:#c9b99a; font-weight:normal; margin-bottom:20px;
   }
-  #startScreen p { color:#8a7d6b; font-size:16px; }
-  #startBtn {
-    margin-top:20px; padding:14px 48px;
-    background:transparent; border:1px solid #8a7d6b;
-    color:#c9b99a; font-size:20px; font-family:inherit;
+  #startScreen p { color:#8a7d6b; font-size:16px; margin-bottom:30px; }
+  
+  .mode-btn {
+    padding:14px 48px; width: 260px;
+    background:transparent; border:1px solid #4a3f32;
+    color:#d4c9b8; font-size:18px; font-family:inherit;
     cursor:pointer; letter-spacing:4px; transition:all 0.3s;
+    position:relative;
   }
-  #startBtn:hover { background:#8a7d6b; color:#1a1714; }
+  .mode-btn:hover { border-color:#8a7d6b; background:#24201a; color:#e8d5a8; }
+  .mode-btn .sub {
+    display:block; font-size:12px; color:#6a5a42; letter-spacing:2px; margin-top:6px;
+  }
 
   #gameScreen { display:none; max-width:820px; margin:0 auto; padding:40px 20px 120px; }
 
   #heart {
     position:fixed; left:30px; bottom:30px;
     width:80px; height:80px; z-index:50;
-    transform-origin:center;
-    transition: filter 0.4s;
+    transform-origin:center; transition: filter 0.4s;
   }
   #heart.calm { filter:none; }
   #heart.excited { filter: hue-rotate(-20deg) saturate(1.6) brightness(1.1); }
 
-  @keyframes pulseSmall {
-    0% { transform: scale(1); }
-    40% { transform: scale(1.06); }
-    100% { transform: scale(1); }
-  }
-  @keyframes pulseBig {
-    0% { transform: scale(1); }
-    40% { transform: scale(1.18); }
-    100% { transform: scale(1); }
-  }
+  @keyframes pulseSmall { 0%{transform:scale(1);} 40%{transform:scale(1.06);} 100%{transform:scale(1);} }
+  @keyframes pulseBig { 0%{transform:scale(1);} 40%{transform:scale(1.18);} 100%{transform:scale(1);} }
 
   #dialogue { font-size:18px; line-height:2; margin-bottom:40px; }
   #dialogue p { margin-bottom:18px; }
   .speaker { color:#e8d5a8; }
-  .speaker.clickable {
-    cursor:pointer;
-    border-bottom:1px dashed rgba(232,213,168,0.4);
-    transition:color 0.2s, border-color 0.2s;
-  }
-  .speaker.clickable:hover {
-    color:#f0e0b8;
-    border-bottom-color:#e8d5a8;
-  }
+  .speaker.clickable { cursor:pointer; border-bottom:1px dashed rgba(232,213,168,0.4); transition:color 0.2s, border-color 0.2s; }
+  .speaker.clickable:hover { color:#f0e0b8; border-bottom-color:#e8d5a8; }
   .narration { color:#a89880; font-style:italic; }
   .thought { color:#c9a87a; }
 
@@ -82,10 +72,7 @@
   }
   .choice-btn:hover { border-color:#8a7d6b; background:#24201a; }
 
-  #betPanel {
-    display:none; border:1px solid #6a5a42;
-    padding:20px; margin-top:10px; background:#1f1a14;
-  }
+  #betPanel { display:none; border:1px solid #6a5a42; padding:20px; margin-top:10px; background:#1f1a14; }
   #betPanel .bet-title { color:#e8d5a8; margin-bottom:14px; font-size:16px; }
   #betPanel .bet-good { color:#7a9e7a; margin-bottom:8px; line-height:1.6; }
   #betPanel .bet-bad { color:#b85c4a; margin-bottom:16px; line-height:1.6; }
@@ -100,38 +87,38 @@
   .bet-action-btn.primary:hover { background:#b85c4a; color:#1a1714; }
   .bet-action-btn.locked { opacity:0.5; }
 
-  @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    20% { transform: translateX(-6px); }
-    40% { transform: translateX(6px); }
-    60% { transform: translateX(-4px); }
-    80% { transform: translateX(4px); }
-  }
+  @keyframes shake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);} }
   .shake { animation: shake 0.4s ease; }
 
-  #warningMsg {
-    display:none;
-    color:#e04838;
-    font-size:18px;
-    margin-top:14px;
-    letter-spacing:2px;
-    font-weight:bold;
-    text-shadow: 0 0 12px rgba(224,72,56,0.6);
-  }
+  #warningMsg { display:none; color:#e04838; font-size:18px; margin-top:14px; letter-spacing:2px; font-weight:bold; text-shadow: 0 0 12px rgba(224,72,56,0.6); }
 
   #result { display:none; margin-top:30px; font-size:17px; line-height:2; }
   #result p { margin-bottom:14px; }
 
+  /* 右侧按钮 */
   #notebookBtn, #statsBtn {
-    position:fixed; right:20px;
-    background:transparent; border:1px solid #4a3f32;
-    color:#d4c9b8; padding:10px 18px;
-    font-family:inherit; font-size:14px; cursor:pointer; z-index:60;
+    position:fixed; right:20px; background:transparent; border:1px solid #4a3f32;
+    color:#d4c9b8; padding:10px 18px; font-family:inherit; font-size:14px; cursor:pointer; z-index:60;
   }
   #notebookBtn { bottom:20px; }
   #statsBtn { bottom:70px; }
   #notebookBtn:hover, #statsBtn:hover { border-color:#8a7d6b; }
 
+  /* 左侧兵法按钮（引导模式） */
+  #guideBtn {
+    display: none;
+    position: fixed;
+    left: 30px; bottom: 130px;
+    background: rgba(60, 50, 40, 0.8); 
+    border: 1px solid #8a7d6b;
+    color: #e8d5a8; padding: 8px 16px;
+    font-family: inherit; font-size: 15px; cursor: pointer; z-index: 60;
+    letter-spacing: 2px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+  }
+  #guideBtn:hover { background: #4a3f32; }
+
+  /* 笔记面板 */
   #notebook {
     display:none; position:fixed; right:20px; bottom:70px;
     width:320px; max-height:450px; overflow-y:auto;
@@ -146,6 +133,27 @@
   .notebook-empty { color:#5a4f42; font-style:italic; font-size:13px; }
   .rumor-item { padding:6px 0; border-bottom:1px dotted #332b22; color:#c9a87a; font-size:13px; line-height:1.7; }
 
+  /* 兵法面板 */
+  #guideOverlay {
+    display: none;
+    position: fixed; left: 30px; bottom: 180px;
+    width: 340px; max-height: 60vh; overflow-y: auto;
+    background: #2a2218; border: 1px solid #6a5a42;
+    padding: 20px; z-index: 65;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.8);
+    font-size: 15px; line-height: 1.8;
+  }
+  #guideOverlay h3 {
+    color: #e8d5a8; font-size: 18px; margin-bottom: 12px;
+    border-bottom: 1px dotted #4a3f32; padding-bottom: 8px;
+    letter-spacing: 2px; font-weight: normal;
+  }
+  #guideOverlay .milestone { color: #c9a87a; font-style: italic; margin-bottom: 10px; }
+  #guideOverlay .advice { color: #a89880; margin-bottom: 16px; border-left: 2px solid #8a5a4a; padding-left: 10px; }
+  #guideOverlay .highlight { color: #e8b0a0; font-weight: bold; }
+  #guideOverlay .mil-tag { font-size: 12px; color: #6a5a42; float: right; }
+
+  /* 飘窗 */
   .float-text {
     position:fixed; background:rgba(60,20,15,0.92);
     border:1px solid #8a3a2a; color:#e8c0a0;
@@ -158,147 +166,74 @@
   .float-text .full { display:none; margin-top:8px; color:#f0d8c0; font-size:13px; }
   .float-text.expanded .full { display:block; }
   .float-text .record-close-btn {
-    display:none; margin-top:10px;
-    padding:4px 12px; background:transparent;
-    border:1px solid #b85c4a; color:#e8b0a0;
-    font-family:inherit; font-size:12px; cursor:pointer;
+    display:none; margin-top:10px; padding:4px 12px; background:transparent;
+    border:1px solid #b85c4a; color:#e8b0a0; font-family:inherit; font-size:12px; cursor:pointer;
   }
   .float-text.expanded .record-close-btn { display:inline-block; }
   .float-text .record-close-btn:hover { background:#b85c4a; color:#1a1714; }
 
   .record-btn {
-    display:inline-block; margin-left:8px;
-    padding:2px 10px; border:1px solid #4a3f32;
-    background:transparent; color:#8a7d6b;
-    font-family:inherit; font-size:12px;
+    display:inline-block; margin-left:8px; padding:2px 10px; border:1px solid #4a3f32;
+    background:transparent; color:#8a7d6b; font-family:inherit; font-size:12px;
     cursor:pointer; vertical-align:middle;
   }
   .record-btn:hover { border-color:#8a7d6b; color:#d4c9b8; }
   .record-btn.done { opacity:0.4; pointer-events:none; }
 
   #redVignette {
-    position:fixed; inset:0; pointer-events:none;
-    z-index:40; opacity:0; transition:opacity 2s ease;
+    position:fixed; inset:0; pointer-events:none; z-index:40; opacity:0; transition:opacity 2s ease;
     box-shadow: inset 0 0 120px 40px rgba(140,20,10,0.55);
   }
 
   #tutorialTip {
-    position:fixed; bottom:120px; right:20px;
-    background:#2a2218; border:1px solid #6a5a42;
-    padding:20px 24px; font-size:16px;
-    color:#c9b99a; max-width:280px;
-    line-height:1.8; z-index:80; display:none;
+    position:fixed; bottom:120px; right:20px; background:#2a2218; border:1px solid #6a5a42;
+    padding:20px 24px; font-size:16px; color:#c9b99a; max-width:280px; line-height:1.8; z-index:80; display:none;
   }
 
-  #scrollHint {
-    text-align:center;
-    color:#5a4f42;
-    font-size:15px;
-    margin-top:40px;
-    padding-bottom:50px;
-    display:none;
-    letter-spacing:4px;
-  }
+  #scrollHint { text-align:center; color:#5a4f42; font-size:15px; margin-top:40px; padding-bottom:50px; display:none; letter-spacing:4px; }
 
   #audioStatus {
     position:fixed; left:50%; top:16px; transform:translateX(-50%);
-    font-size:13px; color:#8a7d6b; z-index:90;
-    background:rgba(26,23,20,0.9); padding:6px 14px;
+    font-size:13px; color:#8a7d6b; z-index:90; background:rgba(26,23,20,0.9); padding:6px 14px;
     border:1px solid #4a3f32; display:none;
   }
 
   #npcOverlay, #statsOverlay, #endingOverlay {
-    position:fixed; inset:0; z-index:150;
-    background:rgba(0,0,0,0.75);
-    display:none;
-    align-items:center; justify-content:center;
-    backdrop-filter: blur(2px);
+    position:fixed; inset:0; z-index:150; background:rgba(0,0,0,0.75);
+    display:none; align-items:center; justify-content:center; backdrop-filter: blur(2px);
   }
   #npcPanel, #statsPanel, #endingPanel {
-    background:#1f1a14;
-    border:1px solid #6a5a42;
-    padding:28px 32px;
-    max-width:460px; width:90%;
-    line-height:1.8;
-    box-shadow: 0 0 40px rgba(0,0,0,0.6);
-    position:relative;
+    background:#1f1a14; border:1px solid #6a5a42; padding:28px 32px;
+    max-width:460px; width:90%; line-height:1.8; box-shadow: 0 0 40px rgba(0,0,0,0.6); position:relative;
   }
-  #npcPanel h3 {
-    color:#e8d5a8; font-size:24px;
-    margin-bottom:6px; letter-spacing:4px;
-    font-weight:normal;
-  }
-  #npcPanel .npc-title {
-    color:#8a7d6b; font-size:13px;
-    margin-bottom:16px; letter-spacing:2px;
-  }
-  #npcPanel .npc-desc {
-    color:#a89880; font-size:15px;
-    margin-bottom:22px; font-style:italic;
-    line-height:1.9;
-    padding-bottom:18px;
-    border-bottom:1px dotted #332b22;
-  }
+  #npcPanel h3 { color:#e8d5a8; font-size:24px; margin-bottom:6px; letter-spacing:4px; font-weight:normal; }
+  #npcPanel .npc-title { color:#8a7d6b; font-size:13px; margin-bottom:16px; letter-spacing:2px; }
+  #npcPanel .npc-desc { color:#a89880; font-size:15px; margin-bottom:22px; font-style:italic; line-height:1.9; padding-bottom:18px; border-bottom:1px dotted #332b22; }
   #npcPanel .stat-row { display:flex; align-items:center; margin-bottom:10px; }
   #npcPanel .stat-name { width:60px; color:#8a7d6b; font-size:14px; letter-spacing:1px; }
   #npcPanel .stat-bar { flex:1; height:8px; background:#2a2218; margin:0 12px; overflow:hidden; }
   #npcPanel .stat-fill { height:100%; transition:width 0.3s ease; }
   #npcPanel .stat-val { width:30px; font-size:14px; text-align:right; font-weight:bold; }
   .close-btn {
-    position:absolute; top:14px; right:18px;
-    background:transparent; border:none;
-    color:#8a7d6b; font-size:22px;
-    cursor:pointer; font-family:inherit; padding:0 6px;
+    position:absolute; top:14px; right:18px; background:transparent; border:none;
+    color:#8a7d6b; font-size:22px; cursor:pointer; font-family:inherit; padding:0 6px;
   }
   .close-btn:hover { color:#e8d5a8; }
-  #npcPanel .hint {
-    color:#5a4f42; font-size:12px;
-    margin-top:18px; text-align:center; letter-spacing:2px;
-  }
+  #npcPanel .hint { color:#5a4f42; font-size:12px; margin-top:18px; text-align:center; letter-spacing:2px; }
 
   #statsPanel { text-align:center; padding:36px 32px 30px; }
-  #statsPanel h3 {
-    color:#e8d5a8; font-size:22px;
-    margin-bottom:6px; letter-spacing:6px; font-weight:normal;
-  }
-  #statsPanel .stats-title-sub {
-    color:#6a5a42; font-size:12px; margin-bottom:26px; letter-spacing:3px;
-  }
-  #statsPanel .stats-desc {
-    color:#d4c9b8; font-size:18px; line-height:2;
-    padding:22px 4px;
-    border-top:1px dotted #332b22;
-    border-bottom:1px dotted #332b22;
-    margin-bottom:20px;
-  }
+  #statsPanel h3 { color:#e8d5a8; font-size:22px; margin-bottom:6px; letter-spacing:6px; font-weight:normal; }
+  #statsPanel .stats-title-sub { color:#6a5a42; font-size:12px; margin-bottom:26px; letter-spacing:3px; }
+  #statsPanel .stats-desc { color:#d4c9b8; font-size:18px; line-height:2; padding:22px 4px; border-top:1px dotted #332b22; border-bottom:1px dotted #332b22; margin-bottom:20px; }
   #statsPanel .stats-foot { color:#5a4f42; font-size:12px; letter-spacing:2px; font-style:italic; }
 
   #endingPanel { text-align:center; padding:40px 36px 32px; }
-  #endingPanel h2 {
-    color:#e8d5a8; font-size:32px;
-    margin-bottom:8px; letter-spacing:10px; font-weight:normal;
-  }
-  #endingPanel .ending-sub {
-    color:#6a5a42; font-size:13px; margin-bottom:28px; letter-spacing:4px;
-  }
-  #endingPanel .ending-text {
-    color:#d4c9b8; font-size:17px; line-height:2.1;
-    text-align:left; margin-bottom:26px;
-    padding:20px 0;
-    border-top:1px dotted #332b22;
-    border-bottom:1px dotted #332b22;
-  }
-  #endingPanel .ending-stats {
-    color:#a89880; font-size:14px; line-height:1.9;
-    text-align:left; margin-bottom:24px;
-  }
+  #endingPanel h2 { color:#e8d5a8; font-size:32px; margin-bottom:8px; letter-spacing:10px; font-weight:normal; }
+  #endingPanel .ending-sub { color:#6a5a42; font-size:13px; margin-bottom:28px; letter-spacing:4px; }
+  #endingPanel .ending-text { color:#d4c9b8; font-size:17px; line-height:2.1; text-align:left; margin-bottom:26px; padding:20px 0; border-top:1px dotted #332b22; border-bottom:1px dotted #332b22; }
+  #endingPanel .ending-stats { color:#a89880; font-size:14px; line-height:1.9; text-align:left; margin-bottom:24px; }
   #endingPanel .ending-stats span { color:#c9a87a; }
-  #endingPanel .restart-btn {
-    background:transparent; border:1px solid #8a7d6b;
-    color:#c9b99a; padding:12px 40px;
-    font-family:inherit; font-size:16px; letter-spacing:4px;
-    cursor:pointer; transition:all 0.3s;
-  }
+  #endingPanel .restart-btn { background:transparent; border:1px solid #8a7d6b; color:#c9b99a; padding:12px 40px; font-family:inherit; font-size:16px; letter-spacing:4px; cursor:pointer; transition:all 0.3s; }
   #endingPanel .restart-btn:hover { background:#8a7d6b; color:#1a1714; }
 </style>
 </head>
@@ -310,7 +245,8 @@
 <div id="startScreen">
   <h1>青石城</h1>
   <p>你守的不是一座城，是一万个家。</p>
-  <button id="startBtn">开始游戏</button>
+  <button class="mode-btn" id="startNormalBtn">普通模式<span class="sub">只凭直觉，向死而生</span></button>
+  <button class="mode-btn" id="startGuideBtn">引导模式<span class="sub">左侧提供兵法提示</span></button>
 </div>
 
 <div id="gameScreen">
@@ -323,8 +259,16 @@
 
 <img id="heart" class="calm" src="https://cdn.phototourl.com/member/2026-11-02-36a5566b-457c-4986-b715-dc7cb965661d.png" alt="">
 
+<!-- 兵法面板 -->
+<div id="guideOverlay">
+  <h3 id="guideTitle">兵法</h3>
+  <div id="guideContent"></div>
+</div>
+
+<button id="guideBtn">兵法</button>
 <button id="statsBtn">我的属性</button>
 <button id="notebookBtn">军帐笔记</button>
+
 <div id="notebook">
   <h3>军帐笔记</h3>
   <h4>军情</h4>
@@ -432,10 +376,12 @@ npcOverlay.onclick = (e) => { if (e.target === npcOverlay) npcOverlay.style.disp
 
 const state = {
   started: false,
+  isGuided: false,
   heartExcited: false,
   forcedBet: false,
   rethought: false,
-  morale: 0,
+  morale: 0,       
+  civilMorale: 0,  
   troops: 12000,
   food: 40,
   water: true,
@@ -447,7 +393,6 @@ const state = {
   floatedTexts: [],
   currentRound: 1,
   playerStats: { 智谋:5, 胆识:5, 统率:5, 威望:5, 果断:5 },
-  // 记录项：key = 类别名，value = true 表示记录过
   noteKeys: {},
 };
 
@@ -521,14 +466,8 @@ function setHeartExcited(excited) {
 }
 
 const STAT_NAMES = ['智谋','胆识','统率','威望','果断'];
-const STRONG_PHRASES = {
-  智谋:'军中都说你心思缜密', 胆识:'军中都说你敢下狠手',
-  统率:'你带兵有方', 威望:'军民都服你', 果断:'你做事从不拖泥带水',
-};
-const WEAK_PHRASES = {
-  智谋:'但有时想得不深', 胆识:'但遇大事有时迟疑',
-  统率:'但不太体恤士卒死活', 威望:'但底下人心里不太服', 果断:'但遇事容易犹豫',
-};
+const STRONG_PHRASES = { 智谋:'军中都说你心思缜密', 胆识:'军中都说你敢下狠手', 统率:'你带兵有方', 威望:'军民都服你', 果断:'你做事从不拖泥带水' };
+const WEAK_PHRASES = { 智谋:'但有时想得不深', 胆识:'但遇大事有时迟疑', 统率:'但不太体恤士卒死活', 威望:'但底下人心里不太服', 果断:'但遇事容易犹豫' };
 
 function describePlayer(stats) {
   const vals = STAT_NAMES.map(n => stats[n]);
@@ -537,11 +476,9 @@ function describePlayer(stats) {
   if ((maxV - minV <= 1) && maxV <= 6 && minV >= 4) return '一个平平无奇的守将，没有特别出彩的地方，也没有明显短板。';
   const maxName = STAT_NAMES[vals.indexOf(maxV)];
   const minName = STAT_NAMES[vals.indexOf(minV)];
-  const hasStrong = maxV >= 6;
-  const hasWeak = minV <= 4;
-  if (hasStrong && hasWeak && maxName !== minName) return STRONG_PHRASES[maxName] + '，' + WEAK_PHRASES[minName] + '。';
-  if (hasStrong) return STRONG_PHRASES[maxName] + '。';
-  if (hasWeak) return '说不上哪里好，' + WEAK_PHRASES[minName] + '。';
+  if (maxV >= 6 && minV <= 4 && maxName !== minName) return STRONG_PHRASES[maxName] + '，' + WEAK_PHRASES[minName] + '。';
+  if (maxV >= 6) return STRONG_PHRASES[maxName] + '。';
+  if (minV <= 4) return '说不上哪里好，' + WEAK_PHRASES[minName] + '。';
   return '一个平平无奇的守将。';
 }
 
@@ -573,23 +510,85 @@ document.getElementById('statsBtn').onclick = () => {
   document.getElementById('statsDesc').textContent = describePlayer(state.playerStats);
   statsOverlay.style.display = 'flex';
   document.getElementById('notebook').style.display = 'none';
+  document.getElementById('guideOverlay').style.display = 'none';
 };
 document.getElementById('statsClose').onclick = () => { statsOverlay.style.display = 'none'; };
 statsOverlay.onclick = (e) => { if (e.target === statsOverlay) statsOverlay.style.display = 'none'; };
 
+// ========== 兵法面板 ==========
+const guideOverlay = document.getElementById('guideOverlay');
+const guideBtn = document.getElementById('guideBtn');
+const guideTitle = document.getElementById('guideTitle');
+const guideContent = document.getElementById('guideContent');
+let guideOpen = false;
+
+guideBtn.onclick = () => {
+  guideOpen = !guideOpen;
+  if (guideOpen) {
+    renderGuide();
+    guideOverlay.style.display = 'block';
+    document.getElementById('notebook').style.display = 'none';
+    statsOverlay.style.display = 'none';
+  } else {
+    guideOverlay.style.display = 'none';
+  }
+};
+
+// 根据当前局势给出动态兵法建议
+function renderGuide() {
+  const r = state.currentRound;
+  guideTitle.textContent = `兵法 · 第${['一','二','三','四','五'][r-1]}轮`;
+  
+  let html = '';
+  
+  if (r === 1) {
+    html += `<div class="milestone">【局势】B军使者喊东门，但西边树林鸟惊。我军兵少但粮足，B军兵多但粮少。</div>`;
+    if (state.playerStats.智谋 >= 6) {
+      html += `<div class="advice">《孙子》云：<span class="highlight">知彼知己，百战不殆</span>。你生性谨慎，不如派斥候去西边树林摸一摸，抓几个舌头，总比瞎猜好。<br><span class="mil-highlight">推荐：选 C。</span></div>`;
+    } else if (state.playerStats.胆识 >= 6) {
+      html += `<div class="advice">《三十六计》云：<span class="highlight">虚则实之，实则虚之</span>。东门喊得响，大概率是诱饵。把主力藏在南门，赌他一把。<br><span class="mil-highlight">推荐：选 A。</span></div>`;
+    } else {
+      html += `<div class="advice">《孙子》云：<span class="highlight">以逸待劳</span>。B军远道而来，粮草不济，最怕拖。不求大胜，只求不败，平均分兵最稳妥。<br><span class="mil-highlight">推荐：选 B。</span></div>`;
+    }
+  } 
+  else if (r === 2) {
+    html += `<div class="milestone">【局势】B军偏师去上游，可能断水，也可能佯动。</div>`;
+    if (state.civilMorale >= 1 || state.morale >= 1) {
+      html += `<div class="advice">《三国》马谡失街亭，就是被断水而败。现在城中本就人心浮动，若再断水，必生内乱。<span class="highlight">哪怕派兵有风险，也不能冒断水的险</span>。<br><span class="mil-highlight">推荐：选 A 或 C。</span></div>`;
+    } else {
+      html += `<div class="advice">《孙子》云：<span class="highlight">兵者，诡道也</span>。B军偏师三千，去上游一半路程。这很可能是佯动，逼你分兵，他好主力攻城。赌一把。<br><span class="mil-highlight">推荐：选 B。</span></div>`;
+    }
+  }
+  else if (r === 3) {
+    html += `<div class="milestone">【局势】缺水缺粮，副将李献计假投降，诱使马副将进城。</div>`;
+    if (state.floatedTexts.includes(0)) {
+      html += `<div class="advice">《孙子》云：<span class="highlight">亲而离之</span>。你已探知马副将与韩主将不和，正好利用。无论用使者、装内乱还是赵将军演降，只要针对马副将，胜算都极高。<br><span class="mil-highlight">推荐：选 A、B、C 均可，务必点开飘窗获取情报。</span></div>`;
+    } else {
+      html += `<div class="advice">《兵法》云：<span class="highlight">利而诱之</span>。马副将贪功，韩主将多疑，这计策有一半机会成。但要小心韩主将将计就计。<br><span class="mil-highlight">建议根据自己属性选：智谋高选 A，果断高选 B，胆识高选 C。</span></div>`;
+    }
+  }
+  else if (r === 4) {
+    html += `<div class="milestone">【局势】B军粮尽，夜换北门旗帜，制造恐慌。</div>`;
+    html += `<div class="advice">《兵法》云：<span class="highlight">三军可夺气，将军可夺心</span>。换旗是为了动摇你的军心民心。此时不可乱，乱则中计。若亲自登城，能稳军心，亦可借机反制。<br><span class="mil-highlight">推荐：选 A（智谋）或 B（统率）。</span></div>`;
+  }
+  else if (r === 5) {
+    html += `<div class="milestone">【局势】B军孤注一掷，最后的强攻。</div>`;
+    html += `<div class="advice">《孙子》云：<span class="highlight">投之亡地然后存，陷之死地然后生</span>。韩主将粮尽，必定死战。此时他大概率打你觉得他不会打的门。结合你前几轮对他的判断，选一个门重兵把守。<br><span class="mil-highlight">推荐：赌单门（A 或 B），平均分兵大概率被打穿一路。</span></div>`;
+  }
+  
+  guideContent.innerHTML = html;
+}
+
 // ========== 笔记 ==========
 function getNoteDisplay(key) {
-  // 动态项：实时读取 state
   if (key === '我军兵力') return String(state.troops);
   if (key === '我军粮草') return state.food + '日';
   if (key === '我军水源') return state.water ? '正常' : '被断';
-  if (key === '我军军心') {
-    return ['稳','微乱','不稳','崩'][state.morale] || '稳';
-  }
+  if (key === '我军军心') return ['稳','微乱','不稳','崩'][state.morale] || '稳';
+  if (key === '城中民心') return ['稳','微乱','不稳','崩'][state.civilMorale] || '稳';
   if (key === '东门') return state.gateEast;
   if (key === '南门') return state.gateSouth;
   if (key === '北门') return state.gateNorth;
-  // 静态项：初值记录
   if (key === 'B军兵力') return '约16000';
   if (key === 'B军粮草') return '约15日';
   return state.notes[key] || '';
@@ -604,11 +603,9 @@ function renderNotebook() {
     empty.style.display = 'block';
   } else {
     empty.style.display = 'none';
-    table.innerHTML = keys.map(k =>
-      `<tr><td>${k}</td><td>${getNoteDisplay(k)}</td></tr>`
-    ).join('');
+    table.innerHTML = keys.map(k => `<tr><td>${k}</td><td>${getNoteDisplay(k)}</td></tr>`).join('');
   }
-  // 奇闻
+  
   const rumorList = document.getElementById('rumorList');
   if (state.rumors.length === 0) {
     rumorList.innerHTML = '<p class="notebook-empty">尚无奇闻。</p>';
@@ -632,10 +629,14 @@ document.getElementById('notebookBtn').onclick = () => {
   notebookOpen = !notebookOpen;
   document.getElementById('notebook').style.display = notebookOpen ? 'block' : 'none';
   renderNotebook();
-  if (notebookOpen) statsOverlay.style.display = 'none';
+  if (notebookOpen) {
+    statsOverlay.style.display = 'none';
+    guideOverlay.style.display = 'none';
+    guideOpen = false;
+  }
 };
 
-// ========== 飘字 ==========
+// ========== 飘窗 ==========
 const floatTextPool = [
   { frag:'……使者……马副将……', full:'B军使者喊话的时候，马副将在后面笑了一下。笑得可得意了。' },
   { frag:'……水坝……表弟……夜里……人……', full:'上游水坝那边，我表弟守夜，说昨天夜里有人影晃，不止一个。' },
@@ -667,16 +668,20 @@ function spawnFloatTexts() {
       addRumor(data.full);
       el.style.opacity = '0';
       setTimeout(() => el.remove(), 400);
-      if (state.morale > 0) {
-        state.morale = Math.max(0, state.morale - 1);
-        updateRedVignette();
-      }
       return;
     }
     el.classList.toggle('expanded');
   };
   document.body.appendChild(el);
   requestAnimationFrame(() => el.classList.add('show'));
+}
+
+function worsenCivilMorale() {
+  state.civilMorale = Math.min(3, state.civilMorale + 1);
+  if (state.civilMorale === 2 && state.morale < 1) state.morale = 1;
+  if (state.civilMorale === 3 && state.morale < 2) state.morale = 2;
+  updateRedVignette();
+  renderNotebook();
 }
 
 function updateRedVignette() {
@@ -746,9 +751,7 @@ function revealOnBottom(callback) {
     scrollHint.style.display = 'none';
     callback();
   };
-  const atBottom = () => {
-    return window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 100;
-  };
+  const atBottom = () => window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 100;
   activeRevealHandler = () => { if (atBottom()) reveal(); };
   setTimeout(() => {
     if (document.documentElement.scrollHeight <= window.innerHeight + 50) { reveal(); return; }
@@ -820,6 +823,7 @@ function showResult(choice, win) {
   } else {
     p.textContent = choice.resultBad;
     applyEffects(choice.effectsBad);
+    worsenCivilMorale();
   }
   resultEl.appendChild(p);
 
@@ -828,22 +832,27 @@ function showResult(choice, win) {
     p2.className = 'thought';
     p2.textContent = '你没有守住青石城。';
     resultEl.appendChild(p2);
-    setTimeout(() => showEnding('城破被俘'), 1000);
+    setTimeout(() => showEnding('城破被俘'), 1200);
     return;
   }
 
-  if (state.morale >= 1) spawnFloatTexts();
+  if (state.morale >= 1 || state.civilMorale >= 1) spawnFloatTexts();
 
   revealOnBottom(() => {
     const contBtn = document.createElement('button');
     contBtn.className = 'bet-action-btn primary';
     contBtn.style.marginTop = '20px';
-    contBtn.textContent = '继续';
-    contBtn.onclick = () => {
-      resultEl.innerHTML = '';
-      resultEl.style.display = 'none';
-      playRound(state.currentRound + 1);
-    };
+    if (state.currentRound === 5) {
+      contBtn.textContent = '看结局';
+      contBtn.onclick = () => { showEnding(); };
+    } else {
+      contBtn.textContent = '继续';
+      contBtn.onclick = () => {
+        resultEl.innerHTML = '';
+        resultEl.style.display = 'none';
+        playRound(state.currentRound + 1);
+      };
+    }
     resultEl.appendChild(contBtn);
   });
 }
@@ -861,7 +870,7 @@ function applyEffects(effects) {
   renderNotebook();
 }
 
-// ========== 第三轮开场 ==========
+// ========== 剧情文本 ==========
 function buildRound3Intro() {
   const lines = [];
   lines.push({ type:'narration', text:'军帐内。油灯快灭了。' });
@@ -869,6 +878,10 @@ function buildRound3Intro() {
     lines.push({ type:'speaker', name:'周先生', text:'主将，城里水井干了。今天又有两个士兵为了一瓢水打架，一个被捅伤了。' });
   } else {
     lines.push({ type:'speaker', name:'周先生', text:'主将，存粮只够二十天了。援军……还是没影。' });
+  }
+  if (state.civilMorale >= 2) {
+    lines.push({ type:'speaker', name:'周先生', text:'而且……城里的百姓都在传，说我们要弃城了。有人开始收拾细软。' });
+    lines.push({ type:'speaker', name:'副将李', text:'底层士兵也听到了，士气有些浮动。' });
   }
   lines.push({ type:'speaker', name:'赵将军', text:'那就打出去！给我五千人，我——' });
   lines.push({ type:'speaker', name:'周先生', text:'赵将军，B军一万六，你带五千人出去，回得来吗？' });
@@ -893,12 +906,14 @@ function buildRound3Intro() {
   return lines;
 }
 
-// ========== 第四轮开场 ==========
 function buildRound4Intro() {
   const lines = [];
   lines.push({ type:'narration', text:'入夜。你刚合眼，外面传来急促的脚步声。' });
   lines.push({ type:'speaker', name:'老陈', text:'主将！北门那边有动静！有人在换旗，咱们的旗被拔了，插上了B军的旗。' });
   lines.push({ type:'speaker', name:'周先生', text:'主将，这是攻心。B军粮快尽了，想让我们自己乱。' });
+  if (state.civilMorale >= 1) {
+    lines.push({ type:'speaker', name:'周先生', text:'城里百姓本就心慌，北门一乱，怕是更压不住了。' });
+  }
   lines.push({ type:'speaker', name:'赵将军', text:'那还等什么？我带人去北门！' });
   lines.push({ type:'speaker', name:'周先生', text:'赵将军，如果北门真是佯攻呢？你带人去了北门，南门空了，B军主力从南门进来怎么办？' });
   lines.push({ type:'speaker', name:'赵将军', text:'那……那我就不去了？' });
@@ -908,7 +923,6 @@ function buildRound4Intro() {
   return lines;
 }
 
-// ========== 第五轮开场 ==========
 function buildRound5Intro() {
   const lines = [];
   lines.push({ type:'narration', text:'天快亮了。B军粮尽。' });
@@ -922,7 +936,6 @@ function buildRound5Intro() {
   return lines;
 }
 
-// ========== 数据 ==========
 const gameContent = {
   round1: {
     intro: [
@@ -947,48 +960,11 @@ const gameContent = {
       { type:'thought', text:'现在，你得做决定。' },
     ],
     choices: [
-      {
-        id:'A',
-        text:'信赵将军：把七千预备队藏南门后巷，东门只留三千。赌B军声东击西。',
-        betGood:'B军南门撞墙，你反杀。',
-        betBad:'B军真打东门，东门三千对一万六，城破。',
-        winChance:0.6,
-        statChanges:{ 胆识:1, 统率:-1 },
-        resultGood:'B军夜袭南门，先头破门而入，你的预备队从巷子杀出，B先头被堵在城门洞里，死伤两千。B主将退兵，顺手烧了南门外民房，掩护撤退。',
-        resultBad:'B军主力猛攻东门。三千人守不住。城破了。你带着亲兵堵在城门洞里，长枪断了就用刀，刀卷了就用拳头。赵将军在你旁边倒下时还在喊"主将快走"。你没走。',
-        death:true,
-        effectsGood:{ troops:-300, food:-4, gateSouth:'受损' },
-        effectsBad:{},
-      },
-      {
-        id:'B',
-        text:'信周先生：东门放六千，南门放四千，留两千机动。不赌，平均分。',
-        betGood:'B军无论打哪个门，你都能顶住。但兵力分散，打不疼B军。',
-        betBad:'B军集中兵力猛攻一门，你可能被消耗得很惨。',
-        winChance:0.6,
-        statChanges:{ 统率:1, 果断:-1 },
-        resultGood:'B军夜袭东门。东门六千人顶住了。B军退兵，你损失不大，但也没伤到B军筋骨。',
-        resultBad:'B军集中主力猛攻东门。东门六千人顶得很苦，你从南门调机动队支援，勉强守住。但伤亡很大。',
-        death:false,
-        effectsGood:{ troops:-800, food:-4 },
-        effectsBad:{ troops:-2000, food:-5, morale:1 },
-      },
-      {
-        id:'C',
-        text:'信老陈：派两千人出城，去西边树林摸一摸，看看鸟为什么惊。',
-        betGood:'如果真是B军小股，你抓几个舌头，问出情报。',
-        betBad:'如果是B军主力，两千人可能回不来。如果是空的，白折腾，士气下降。',
-        winChance:0.6,
-        statChanges:{ 智谋:1, 胆识:-1 },
-        resultGood:'两千人摸到西边树林，抓了三个B军斥候。审出B军主力在南边，东门喊话是假的。',
-        resultBad:'两千人走进树林，再也没回来。B军主力确实在西边。你少了2000人，还什么也没换到。',
-        death:false,
-        effectsGood:{ troops:-200, food:-3 },
-        effectsBad:{ troops:-2000, morale:1, food:-3 },
-      },
+      { id:'A', text:'信赵将军：把七千预备队藏南门后巷，东门只留三千。赌B军声东击西。', betGood:'B军南门撞墙，你反杀。', betBad:'B军真打东门，东门三千对一万六，城破。', winChance:0.6, statChanges:{ 胆识:1, 统率:-1 }, resultGood:'B军夜袭南门，先头破门而入，你的预备队从巷子杀出，B先头被堵在城门洞里，死伤两千。B主将退兵，顺手烧了南门外民房，掩护撤退。', resultBad:'B军主力猛攻东门。三千人守不住。城破了。你带着亲兵堵在城门洞里，长枪断了就用刀，刀卷了就用拳头。赵将军在你旁边倒下时还在喊"主将快走"。你没走。', death:true, effectsGood:{ troops:-300, food:-4, gateSouth:'受损' }, effectsBad:{} },
+      { id:'B', text:'信周先生：东门放六千，南门放四千，留两千机动。不赌，平均分。', betGood:'B军无论打哪个门，你都能顶住。但兵力分散，打不疼B军。', betBad:'B军集中兵力猛攻一门，你可能被消耗得很惨。', winChance:0.6, statChanges:{ 统率:1, 果断:-1 }, resultGood:'B军夜袭东门。东门六千人顶住了。B军退兵，你损失不大，但也没伤到B军筋骨。', resultBad:'B军集中主力猛攻东门。东门六千人顶得很苦，你从南门调机动队支援，勉强守住。但伤亡很大。', death:false, effectsGood:{ troops:-800, food:-4 }, effectsBad:{ troops:-2000, food:-5, morale:1 } },
+      { id:'C', text:'信老陈：派两千人出城，去西边树林摸一摸，看看鸟为什么惊。', betGood:'如果真是B军小股，你抓几个舌头，问出情报。', betBad:'如果是B军主力，两千人可能回不来。如果是空的，白折腾，士气下降。', winChance:0.6, statChanges:{ 智谋:1, 胆识:-1 }, resultGood:'两千人摸到西边树林，抓了三个B军斥候。审出B军主力在南边，东门喊话是假的。', resultBad:'两千人走进树林，再也没回来。B军主力确实在西边。你少了2000人，还什么也没换到。', death:false, effectsGood:{ troops:-200, food:-3 }, effectsBad:{ troops:-2000, morale:1, food:-3 } }
     ],
   },
-
   round2: {
     intro: [
       { type:'speaker', name:'老陈', text:'主将，B军派了一支偏师，大概三千人，往上游去了。' },
@@ -1001,189 +977,33 @@ const gameContent = {
       { type:'thought', text:'这就是赌。' },
     ],
     choices: [
-      {
-        id:'A',
-        text:'派四千人守水坝。',
-        betGood:'B军真去断水，你守住了水源。但城里少了四千人，B军主力可能趁机攻城。',
-        betBad:'B军是佯动，你白分兵。B军主力趁机猛攻，城里空虚。',
-        winChance:0.6,
-        statChanges:{ 统率:1, 智谋:-1 },
-        resultGood:'四千人赶到上游，正好撞上B军偏师。打了一场硬仗，B军偏师退走。水坝保住了。但城里少了四千人，B军主力当天夜里试探性攻了一下东门，你勉强守住。',
-        resultBad:'四千人到了水坝，什么都没发现。B军那三千人根本没去上游，就在半路等着。等你的四千人走远了，B军主力突然猛攻南门。你手里兵不够，南门差点破了，丢了三千人。',
-        effectsGood:{ troops:-800, food:-3 },
-        effectsBad:{ troops:-3000, food:-5, morale:1 },
-      },
-      {
-        id:'B',
-        text:'不派兵。赌B军是佯动。',
-        betGood:'B军确实是佯动，你不上当，B军白跑一趟。',
-        betBad:'B军真去断水，城里水源被掐。',
-        winChance:0.4,
-        statChanges:{ 智谋:1, 胆识:1 },
-        resultGood:'你按兵不动。三天后，老陈回报：那三千人走到半路又折回去了。B军白跑一趟。周先生松了口气，但随即皱眉："B军不会白跑。他一定在等什么。"',
-        resultBad:'三天后，城里水井开始干。老陈跑来说上游水坝被B军占了，水流断了。城里存水只够三天。士兵开始偷水，有人为了一瓢水打架。周先生急了："主将，断水比断粮还狠。"',
-        effectsGood:{ troops:-100, food:-2 },
-        effectsBad:{ water:false, food:-8, morale:2 },
-      },
-      {
-        id:'C',
-        text:'派两千人佯装守水坝，主力藏城里。',
-        betGood:'B军真去断水，两千人据险而守，拖住B军偏师。你趁机派主力增援。',
-        betBad:'B军是佯动，你分了两千人出去，城里更空虚。',
-        winChance:0.6,
-        statChanges:{ 智谋:1, 果断:1 },
-        resultGood:'两千人赶到水坝，人少但据险而守。B军偏师三千人攻了半天攻不下来。你趁机派主力增援。B军偏师退走。水坝保住了，但两千人损失了一千二。',
-        resultBad:'两千人到了水坝，什么都没发现。B军主力趁机攻城，你兵力更少，南门被撞开一个缺口，丢了一千五百人。',
-        effectsGood:{ troops:-1200, food:-4 },
-        effectsBad:{ troops:-1500, food:-4, morale:1 },
-      },
+      { id:'A', text:'派四千人守水坝。', betGood:'B军真去断水，你守住了水源。但城里少了四千人，B军主力可能趁机攻城。', betBad:'B军是佯动，你白分兵。B军主力趁机猛攻，城里空虚。', winChance:0.6, statChanges:{ 统率:1, 智谋:-1 }, resultGood:'四千人赶到上游，正好撞上B军偏师。打了一场硬仗，B军偏师退走。水坝保住了。但城里少了四千人，B军主力当天夜里试探性攻了一下东门，你勉强守住。', resultBad:'四千人到了水坝，什么都没发现。B军那三千人根本没去上游，就在半路等着。等你的四千人走远了，B军主力突然猛攻南门。你手里兵不够，南门差点破了，丢了三千人。', effectsGood:{ troops:-800, food:-3 }, effectsBad:{ troops:-3000, food:-5, morale:1 } },
+      { id:'B', text:'不派兵。赌B军是佯动。', betGood:'B军确实是佯动，你不上当，B军白跑一趟。', betBad:'B军真去断水，城里水源被掐。', winChance:0.4, statChanges:{ 智谋:1, 胆识:1 }, resultGood:'你按兵不动。三天后，老陈回报：那三千人走到半路又折回去了。B军白跑一趟。周先生松了口气，但随即皱眉："B军不会白跑。他一定在等什么。"', resultBad:'三天后，城里水井开始干。老陈跑来说上游水坝被B军占了，水流断了。城里存水只够三天。士兵开始偷水，有人为了一瓢水打架。周先生急了："主将，断水比断粮还狠。"', effectsGood:{ troops:-100, food:-2 }, effectsBad:{ water:false, food:-8, morale:1 } },
+      { id:'C', text:'派两千人佯装守水坝，主力藏城里。', betGood:'B军真去断水，两千人据险而守，拖住B军偏师。你趁机派主力增援。', betBad:'B军是佯动，你分了两千人出去，城里更空虚。', winChance:0.6, statChanges:{ 智谋:1, 果断:1 }, resultGood:'两千人赶到水坝，人少但据险而守。B军偏师三千人攻了半天攻不下来。你趁机派主力增援。B军偏师退走。水坝保住了，但两千人损失了一千二。', resultBad:'两千人到了水坝，什么都没发现。B军主力趁机攻城，你兵力更少，南门被撞开一个缺口，丢了一千五百人。', effectsGood:{ troops:-1200, food:-4 }, effectsBad:{ troops:-1500, food:-4, morale:1 } },
     ],
   },
-
   round3: {
     getIntro: buildRound3Intro,
     choices: [
-      {
-        id:'A',
-        text:'低声下气派使者谈条件，开西门让马副将进来"验粮"。',
-        betGood:'马副将贪功进城，被你在城内伏击，损兵三千。',
-        betBad:'韩主将识破，亲率主力强攻东门，你损失惨重。',
-        winChance:0.55,
-        statBonus:{ 智谋:0.04 },
-        floatBonus:{ index:0, bonus:0.05 },
-        statChanges:{ 智谋:1, 胆识:1, 统率:-1 },
-        resultGood:'使者进了B营，低头哈腰，把A军说得不堪一击。马副将在帐后听着，嘴角翘了起来。当晚，他带三千人进西门"验粮"。走到街口，两边屋顶火油罐砸下，伏兵杀出。马副将大败，逃出城时只剩一千多。',
-        resultBad:'使者进了B营，话还没说完，韩主将就笑了。他假装答应，让使者回去等消息。第二天夜里，B军主力突然猛攻东门。你的伏兵等来的不是马副将，是韩主将。东门差点破了，你损兵两千。',
-        death:false,
-        effectsGood:{ troops:-300, food:-2 },
-        effectsBad:{ troops:-2000, food:-4, morale:1 },
-      },
-      {
-        id:'B',
-        text:'开城门缝，让B军哨兵看到A军内乱，引诱马副将抢功。',
-        betGood:'马副将看到A军内乱，以为有机可乘，带兵冲进来，中了埋伏。',
-        betBad:'韩主将按住马副将，只派小股部队试探，你白忙一夜。',
-        winChance:0.55,
-        statBonus:{ 果断:0.04 },
-        floatBonus:{ index:0, bonus:0.05 },
-        statChanges:{ 果断:1, 威望:1, 智谋:-1 },
-        resultGood:'你让人把西门打开一条缝，几个士兵在门口推搡、吵架，像在抢东西。B军哨兵看到了，回去报告。马副将在营里坐不住了："A军内乱了！再不抢就没了！"他不等韩主将下令，带兵冲了过来。进了城门，伏兵四起。',
-        resultBad:'B军哨兵看到了A军门口的乱象，回去报告。韩主将听完，只说了一句："假的。"他按住马副将，只派了两百人试探性攻了一下西门。你的伏兵等了半夜，等来两百人。计谋落了空，士兵白冻了一夜。',
-        death:false,
-        effectsGood:{ troops:-500, food:-2 },
-        effectsBad:{ troops:-800, food:-3, morale:1 },
-      },
-      {
-        id:'C',
-        text:'让赵将军带人假装叛变，开东门引B军进来。',
-        betGood:'马副将大喜，亲自来接收。赵将军趁其不备，拔刀反杀。',
-        betBad:'韩主将看穿赵将军的戏，设下反埋伏。赵将军拼死杀出，损失惨重。',
-        winChance:0.5,
-        statBonus:{ 胆识:0.04 },
-        floatBonus:{ index:0, bonus:0.05 },
-        statChanges:{ 胆识:1, 统率:1, 威望:-1 },
-        resultGood:'赵将军带着几十个亲兵，衣甲不整，跑到B军营前大喊"我等受够了那个庸主，特来投降"。马副将在营里一听，大喜：A军将领都来降了！他亲自带人出来接收。赵将军趁他不备，拔刀就砍。马副将大败，逃回营里。',
-        resultBad:'赵将军带人跑到B军营前请降。韩主将站在营门口，看了一眼赵将军的衣甲，说："衣甲不整，但刀在鞘里没拔。降将哪有刀不离手的？"赵将军被围。他拼死杀出，带去的几十个亲兵只回来三个。你站在城头，看见赵将军满身是血地跑回来，第一句话是："主将，我……我演砸了。"',
-        death:false,
-        effectsGood:{ troops:-200, food:-2 },
-        effectsBad:{ troops:-1000, food:-3, morale:1 },
-      },
+      { id:'A', text:'低声下气派使者谈条件，开西门让马副将进来"验粮"。', betGood:'马副将贪功进城，被你在城内伏击，损兵三千。', betBad:'韩主将识破，亲率主力强攻东门，你损失惨重。', winChance:0.55, statBonus:{ 智谋:0.04 }, floatBonus:{ index:0, bonus:0.05 }, statChanges:{ 智谋:1, 胆识:1, 统率:-1 }, resultGood:'使者进了B营，低头哈腰，把A军说得不堪一击。马副将在帐后听着，嘴角翘了起来。当晚，他带三千人进西门"验粮"。走到街口，两边屋顶火油罐砸下，伏兵杀出。马副将大败，逃出城时只剩一千多。', resultBad:'使者进了B营，话还没说完，韩主将就笑了。他假装答应，让使者回去等消息。第二天夜里，B军主力突然猛攻东门。你的伏兵等来的不是马副将，是韩主将。东门差点破了，你损兵两千。', death:false, effectsGood:{ troops:-300, food:-2 }, effectsBad:{ troops:-2000, food:-4, morale:1 } },
+      { id:'B', text:'开城门缝，让B军哨兵看到A军内乱，引诱马副将抢功。', betGood:'马副将看到A军内乱，以为有机可乘，带兵冲进来，中了埋伏。', betBad:'韩主将按住马副将，只派小股部队试探，你白忙一夜。', winChance:0.55, statBonus:{ 果断:0.04 }, floatBonus:{ index:0, bonus:0.05 }, statChanges:{ 果断:1, 威望:1, 智谋:-1 }, resultGood:'你让人把西门打开一条缝，几个士兵在门口推搡、吵架，像在抢东西。B军哨兵看到了，回去报告。马副将在营里坐不住了："A军内乱了！再不抢就没了！"他不等韩主将下令，带兵冲了过来。进了城门，伏兵四起。', resultBad:'B军哨兵看到了A军门口的乱象，回去报告。韩主将听完，只说了一句："假的。"他按住马副将，只派了两百人试探性攻了一下西门。你的伏兵等了半夜，等来两百人。计谋落了空，士兵白冻了一夜。', death:false, effectsGood:{ troops:-500, food:-2 }, effectsBad:{ troops:-800, food:-3, morale:1 } },
+      { id:'C', text:'让赵将军带人假装叛变，开东门引B军进来。', betGood:'马副将大喜，亲自来接收。赵将军趁其不备，拔刀反杀。', betBad:'韩主将看穿赵将军的戏，设下反埋伏。赵将军拼死杀出，损失惨重。', winChance:0.5, statBonus:{ 胆识:0.04 }, floatBonus:{ index:0, bonus:0.05 }, statChanges:{ 胆识:1, 统率:1, 威望:-1 }, resultGood:'赵将军带着几十个亲兵，衣甲不整，跑到B军营前大喊"我等受够了那个庸主，特来投降"。马副将在营里一听，大喜：A军将领都来降了！他亲自带人出来接收。赵将军趁他不备，拔刀就砍。马副将大败，逃回营里。', resultBad:'赵将军带人跑到B军营前请降。韩主将站在营门口，看了一眼赵将军的衣甲，说："衣甲不整，但刀在鞘里没拔。降将哪有刀不离手的？"赵将军被围。他拼死杀出，带去的几十个亲兵只回来三个。你站在城头，看见赵将军满身是血地跑回来，第一句话是："主将，我……我演砸了。"', death:false, effectsGood:{ troops:-200, food:-2 }, effectsBad:{ troops:-1000, food:-3, morale:1 } },
     ],
   },
-
   round4: {
     getIntro: buildRound4Intro,
     choices: [
-      {
-        id:'A',
-        text:'亲自登城查看。若只有几百人喊，就把计就计，反用换旗计。',
-        betGood:'你发现是佯攻，反插B旗，引B伏兵出来，重创之。',
-        betBad:'你赌错了，北门是真攻。你亲自登城也没用，北门被攻破。',
-        winChance:0.55,
-        statBonus:{ 智谋:0.04 },
-        statChanges:{ 智谋:1, 胆识:1 },
-        resultGood:'你登上北门城楼，往下看。外面只有几百人，举着火把乱喊，没有大部队涌进来。你判断是佯攻。你下令把北门内也插上B旗，敲A鼓，喊"B军进城了，往南门跑"。B伏兵一听，以为A真乱了，冲出来抢功。城头万箭齐发，B伏兵损失一千五。',
-        resultBad:'你登上北门城楼，正往下看，B军主力突然从北门两侧杀出。他们真的打北门。你亲自督战也挡不住，北门被撞开一个缺口。你退到内城，损失两千人。',
-        death:false,
-        effectsGood:{ troops:-300, food:-2 },
-        effectsBad:{ troops:-2000, food:-4, morale:1, gateNorth:'受损' },
-      },
-      {
-        id:'B',
-        text:'稳守北门，主力不动。赌B军是佯攻。',
-        betGood:'B军确实是佯攻，你不上当。',
-        betBad:'B军真的从北门攻进来，北门兵力不足。',
-        winChance:0.6,
-        statBonus:{ 统率:0.04 },
-        statChanges:{ 统率:1, 果断:1 },
-        resultGood:'你下令北门守军稳住，主力不动。北门外面的喊声持续了半个时辰，渐渐停了。老陈回报：B军那几百人撤了。是佯攻。你松了口气。',
-        resultBad:'你下令主力不动。但北门外面喊声越来越大，B军真的从北门攻进来。北门守军兵力不足，被撞开缺口。你紧急调兵，勉强堵住，但损失一千五。',
-        death:false,
-        effectsGood:{ troops:-100, food:-2 },
-        effectsBad:{ troops:-1500, food:-4, morale:1, gateNorth:'受损' },
-      },
-      {
-        id:'C',
-        text:'分兵防南门。赌B军声东击西，北门是假，南门是真。',
-        betGood:'B军真从南门来，你分兵正好堵住。',
-        betBad:'B军真打北门，你分兵南门，北门空了。',
-        winChance:0.5,
-        statBonus:{ 果断:0.04 },
-        statChanges:{ 果断:1, 统率:-1 },
-        resultGood:'你分兵去南门。果然，B军趁北门乱喊，主力悄悄摸向南门。你南门兵力充足，B军撞了个头破血流。北门的佯攻也撤了。',
-        resultBad:'你分兵去南门。但北门外面的喊声突然变大，B军真的从北门攻进来。你北门兵力不足，被撞开缺口。你紧急从南门调兵回来，勉强堵住，但损失两千。',
-        death:false,
-        effectsGood:{ troops:-200, food:-2 },
-        effectsBad:{ troops:-2000, food:-4, morale:1, gateNorth:'受损' },
-      },
+      { id:'A', text:'亲自登城查看。若只有几百人喊，就把计就计，反用换旗计。', betGood:'你发现是佯攻，反插B旗，引B伏兵出来，重创之。', betBad:'你赌错了，北门是真攻。你亲自登城也没用，北门被攻破。', winChance:0.55, statBonus:{ 智谋:0.04 }, statChanges:{ 智谋:1, 胆识:1 }, resultGood:'你登上北门城楼，往下看。外面只有几百人，举着火把乱喊，没有大部队涌进来。你判断是佯攻。你下令把北门内也插上B旗，敲A鼓，喊"B军进城了，往南门跑"。B伏兵一听，以为A真乱了，冲出来抢功。城头万箭齐发，B伏兵损失一千五。', resultBad:'你登上北门城楼，正往下看，B军主力突然从北门两侧杀出。他们真的打北门。你亲自督战也挡不住，北门被撞开一个缺口。你退到内城，损失两千人。', death:false, effectsGood:{ troops:-300, food:-2 }, effectsBad:{ troops:-2000, food:-4, morale:1, gateNorth:'受损' } },
+      { id:'B', text:'稳守北门，主力不动。赌B军是佯攻。', betGood:'B军确实是佯攻，你不上当。', betBad:'B军真的从北门攻进来，北门兵力不足。', winChance:0.6, statBonus:{ 统率:0.04 }, statChanges:{ 统率:1, 果断:1 }, resultGood:'你下令北门守军稳住，主力不动。北门外面的喊声持续了半个时辰，渐渐停了。老陈回报：B军那几百人撤了。是佯攻。你松了口气。', resultBad:'你下令主力不动。但北门外面喊声越来越大，B军真的从北门攻进来。北门守军兵力不足，被撞开缺口。你紧急调兵，勉强堵住，但损失一千五。', death:false, effectsGood:{ troops:-100, food:-2 }, effectsBad:{ troops:-1500, food:-4, morale:1, gateNorth:'受损' } },
+      { id:'C', text:'分兵防南门。赌B军声东击西，北门是假，南门是真。', betGood:'B军真从南门来，你分兵正好堵住。', betBad:'B军真打北门，你分兵南门，北门空了。', winChance:0.5, statBonus:{ 果断:0.04 }, statChanges:{ 果断:1, 统率:-1 }, resultGood:'你分兵去南门。果然，B军趁北门乱喊，主力悄悄摸向南门。你南门兵力充足，B军撞了个头破血流。北门的佯攻也撤了。', resultBad:'你分兵去南门。但北门外面的喊声突然变大，B军真的从北门攻进来。你北门兵力不足，被撞开缺口。你紧急从南门调兵回来，勉强堵住，但损失两千。', death:false, effectsGood:{ troops:-200, food:-2 }, effectsBad:{ troops:-2000, food:-4, morale:1, gateNorth:'受损' } },
     ],
   },
-
   round5: {
     getIntro: buildRound5Intro,
     choices: [
-      {
-        id:'A',
-        text:'主力放东门。东门受损最轻，B军可能以为你会重点防南门。',
-        betGood:'B军主攻东门，你主力在此，大胜。',
-        betBad:'B军打南门，你主力放错，南门吃紧。',
-        winChance:0.55,
-        statBonus:{ 智谋:0.04 },
-        statChanges:{ 智谋:1, 果断:1 },
-        mainGate:'east',
-        resultGood:'B军果然主攻东门。你主力在此，顶住了。韩主将亲自督战，但A军死士绕后抢了他的帅旗，砍了战鼓。B军后军先乱，全线崩溃。',
-        resultBad:'B军主攻南门。你主力在东门，南门吃紧。你紧急调兵，勉强守住，但损失惨重。B军粮尽退走。',
-        effectsGood:{ troops:-1500, food:-3 },
-        effectsBad:{ troops:-3500, food:-4, morale:1 },
-      },
-      {
-        id:'B',
-        text:'主力放南门。南门之前受损，B军可能趁虚而入。',
-        betGood:'B军主攻南门，你主力在此，大胜。',
-        betBad:'B军打东门，你主力放错，东门吃紧。',
-        winChance:0.55,
-        statBonus:{ 统率:0.04 },
-        statChanges:{ 统率:1, 胆识:1 },
-        mainGate:'south',
-        resultGood:'B军果然主攻南门。你主力在此，顶住了。韩主将亲自督战，但A军死士绕后抢了他的帅旗，砍了战鼓。B军后军先乱，全线崩溃。',
-        resultBad:'B军主攻东门。你主力在南门，东门吃紧。你紧急调兵，勉强守住，但损失惨重。B军粮尽退走。',
-        effectsGood:{ troops:-1500, food:-3 },
-        effectsBad:{ troops:-3500, food:-4, morale:1 },
-      },
-      {
-        id:'C',
-        text:'平均分兵。不赌。',
-        betGood:'无论B军打哪个门，你都能顶住，但打不疼B军。',
-        betBad:'B军集中兵力猛攻一门，你平均分兵，可能被消耗。',
-        winChance:0.6,
-        statBonus:{ 威望:0.03 },
-        statChanges:{ 统率:1, 威望:1 },
-        mainGate:'even',
-        resultGood:'B军主攻东门。你兵力分散，但各门都能顶住。B军攻了半天攻不下来，粮尽退走。你损失不小，但城守住了。',
-        resultBad:'B军集中主力猛攻东门。你平均分兵，东门吃紧。你紧急调兵，勉强守住，但损失很大。B军粮尽退走。',
-        effectsGood:{ troops:-2200, food:-3 },
-        effectsBad:{ troops:-3000, food:-4, morale:1 },
-      },
+      { id:'A', text:'主力放东门。东门受损最轻，B军可能以为你会重点防南门。', betGood:'B军主攻东门，你主力在此，大胜。', betBad:'B军打南门，你主力放错，南门吃紧。', winChance:0.55, statBonus:{ 智谋:0.04 }, statChanges:{ 智谋:1, 果断:1 }, resultGood:'B军果然主攻东门。你主力在此，顶住了。韩主将亲自督战，但A军死士绕后抢了他的帅旗，砍了战鼓。B军后军先乱，全线崩溃。', resultBad:'B军主攻南门。你主力在东门，南门吃紧。你紧急调兵，勉强守住，但损失惨重。B军粮尽退走。', effectsGood:{ troops:-1500, food:-3 }, effectsBad:{ troops:-3500, food:-4, morale:1 } },
+      { id:'B', text:'主力放南门。南门之前受损，B军可能趁虚而入。', betGood:'B军主攻南门，你主力在此，大胜。', betBad:'B军打东门，你主力放错，东门吃紧。', winChance:0.55, statBonus:{ 统率:0.04 }, statChanges:{ 统率:1, 胆识:1 }, resultGood:'B军果然主攻南门。你主力在此，顶住了。韩主将亲自督战，但A军死士绕后抢了他的帅旗，砍了战鼓。B军后军先乱，全线崩溃。', resultBad:'B军主攻东门。你主力在南门，东门吃紧。你紧急调兵，勉强守住，但损失惨重。B军粮尽退走。', effectsGood:{ troops:-1500, food:-3 }, effectsBad:{ troops:-3500, food:-4, morale:1 } },
+      { id:'C', text:'平均分兵。不赌。', betGood:'无论B军打哪个门，你都能顶住，但打不疼B军。', betBad:'B军集中兵力猛攻一门，你平均分兵，可能被消耗。', winChance:0.6, statBonus:{ 威望:0.03 }, statChanges:{ 统率:1, 威望:1 }, resultGood:'B军主攻东门。你兵力分散，但各门都能顶住。B军攻了半天攻不下来，粮尽退走。你损失不小，但城守住了。', resultBad:'B军集中主力猛攻东门。你平均分兵，东门吃紧。你紧急调兵，勉强守住，但损失很大。B军粮尽退走。', effectsGood:{ troops:-2200, food:-3 }, effectsBad:{ troops:-3000, food:-4, morale:1 } },
     ],
   },
 };
@@ -1192,6 +1012,11 @@ function playRound(roundNum) {
   state.currentRound = roundNum;
   state.forcedBet = false;
   state.rethought = false;
+  
+  if (state.isGuided) {
+    guideOpen = false;
+    guideOverlay.style.display = 'none';
+  }
 
   if (roundNum === 1) {
     renderDialogue(gameContent.round1.intro);
@@ -1203,7 +1028,7 @@ function playRound(roundNum) {
     btn1.onclick = () => { addNoteKey('我军兵力'); addNoteKey('B军兵力'); btn1.textContent='已记'; btn1.classList.add('done'); };
     const btn2 = document.createElement('button');
     btn2.className = 'record-btn'; btn2.textContent = '记下粮草';
-    btn2.onclick = () => { addNoteKey('我军粮草'); addNoteKey('B军粮草'); btn2.textContent='已记'; btn2.classList.add('done'); };
+    btn2.onclick = () => { addNoteKey('我军粮草'); addNoteKey('B军粮草'); addNoteKey('城中民心'); addNoteKey('我军军心'); btn2.textContent='已记'; btn2.classList.add('done'); };
     infoP.appendChild(btn1); infoP.appendChild(btn2);
     dialogueEl.appendChild(infoP);
     revealOnBottom(() => { showChoices(gameContent.round1.choices); showTutorialTip(); });
@@ -1239,7 +1064,6 @@ function showEnding(forcedEnding) {
 
   const titles = { '城破被俘':'城 破', '惨胜':'惨 胜', '守住':'守 住', '大胜':'大 胜' };
   const subs = { '城破被俘':'青石城破，你被俘', '惨胜':'城守住了，但代价太大', '守住':'城还在，人还在', '大胜':'B军溃退，你赢了' };
-
   const texts = {
     '城破被俘': 'B军从缺口涌进来。你带着最后的亲兵退到内城，刀砍卷了，人也站不住了。周先生挡在你前面，被一枪穿胸。他倒下前最后一句是："主将，老臣……赌错了。" 城破的时候，天还没亮。',
     '惨胜': 'B军退走了。你站在城头，脚下全是尸体，分不清是A军还是B军。老陈在清点人数，周先生不说话，赵将军蹲在墙角。城守住了，但你不知道自己还剩多少能打的兵。风一吹，城头的旗子只剩下半面。',
@@ -1247,86 +1071,38 @@ function showEnding(forcedEnding) {
     '大胜': 'B军溃退。韩主将带着残部过河，河对岸的弓手射住了你的追兵。他跑了，但带不走那一万多人。你站在城头，看着B军旗子倒下的地方。周先生走过来，只说了一句："主将，天亮了。" 你看着天边，不知道该不该高兴。'
   };
 
-  const titleEl = document.getElementById('endingTitle');
-  const subEl = document.getElementById('endingSub');
-  const textEl = document.getElementById('endingText');
-  const statsEl = document.getElementById('endingStats');
-
-  titleEl.textContent = titles[ending];
-  subEl.textContent = subs[ending];
-  textEl.textContent = texts[ending];
-  statsEl.innerHTML =
+  document.getElementById('endingTitle').textContent = titles[ending];
+  document.getElementById('endingSub').textContent = subs[ending];
+  document.getElementById('endingText').textContent = texts[ending];
+  document.getElementById('endingStats').innerHTML =
     `剩余兵力：<span>${Math.max(0, state.troops)}</span>　` +
     `剩余粮草：<span>${Math.max(0, state.food)}日</span><br>` +
     `军心：<span>${['稳','微乱','不稳','崩'][state.morale] || '稳'}</span>　` +
+    `民心：<span>${['稳','微乱','不稳','崩'][state.civilMorale] || '稳'}</span><br>` +
     `水源：<span>${state.water?'正常':'被断'}</span><br>` +
     `在军民眼中：<span>${describePlayer(state.playerStats)}</span>`;
 
   document.getElementById('endingOverlay').style.display = 'flex';
 }
 
-// 第五轮结果特殊处理：触发结局
-const originalShowResult = showResult;
-showResult = function(choice, win) {
-  originalShowResult(choice, win);
-  if (state.currentRound === 5) {
-    // 第五轮结果后，等待用户滚到底部点"继续"再进入结局
-  }
-};
-
-// 重写第五轮结果的继续按钮，改为进入结局
-function playRound5Ending() {
-  showEnding();
-}
-
-// 在 showResult 的 continue 按钮逻辑里判断
-const originalReveal = revealOnBottom;
-showResult = function(choice, win) {
-  resultEl.style.display = 'block';
-  resultEl.innerHTML = '';
-  const p = document.createElement('p');
-  p.className = 'narration';
-  if (win) { p.textContent = choice.resultGood; applyEffects(choice.effectsGood); }
-  else { p.textContent = choice.resultBad; applyEffects(choice.effectsBad); }
-  resultEl.appendChild(p);
-
-  if (choice.death) {
-    const p2 = document.createElement('p');
-    p2.className = 'thought'; p2.textContent = '你没有守住青石城。';
-    resultEl.appendChild(p2);
-    setTimeout(() => showEnding('城破被俘'), 1200);
-    return;
-  }
-
-  if (state.morale >= 1) spawnFloatTexts();
-
-  revealOnBottom(() => {
-    const contBtn = document.createElement('button');
-    contBtn.className = 'bet-action-btn primary';
-    contBtn.style.marginTop = '20px';
-    if (state.currentRound === 5) {
-      contBtn.textContent = '看结局';
-      contBtn.onclick = () => { showEnding(); };
-    } else {
-      contBtn.textContent = '继续';
-      contBtn.onclick = () => {
-        resultEl.innerHTML = '';
-        resultEl.style.display = 'none';
-        playRound(state.currentRound + 1);
-      };
-    }
-    resultEl.appendChild(contBtn);
-  });
-};
-
-document.getElementById('startBtn').onclick = () => {
+// ========== 启动 ==========
+function startGame(isGuided) {
+  state.isGuided = isGuided;
   document.getElementById('startScreen').style.display = 'none';
   document.getElementById('gameScreen').style.display = 'block';
   state.started = true;
+  
+  if (isGuided) {
+    guideBtn.style.display = 'block';
+  }
+  
   startBgm();
   requestAnimationFrame(checkTicks);
   playRound(1);
-};
+}
+
+document.getElementById('startNormalBtn').onclick = () => startGame(false);
+document.getElementById('startGuideBtn').onclick = () => startGame(true);
 </script>
 </body>
 </html>
