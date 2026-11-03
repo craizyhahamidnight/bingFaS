@@ -142,7 +142,7 @@
   .record-btn.done { opacity:0.4; pointer-events:none; }
 
   #redVignette {
-    position:fixed; inset:0; pointer-events:none; z-index:40; opacity:0; transition:opacity 2s ease;
+    position:fixed; inset:0; pointer-events:none; z-index:40; opacity:0; transition:opacity 1s ease;
     box-shadow: inset 0 0 120px 40px rgba(140,20,10,0.55);
   }
 
@@ -694,6 +694,13 @@ function updateRedVignette() {
   else { v.style.opacity = 0.9; body.classList.add('danger'); }
 }
 
+// 强制清理红光
+function clearRedVignette() {
+  const v = document.getElementById('redVignette');
+  v.style.opacity = 0;
+  document.body.classList.remove('warning', 'danger');
+}
+
 // ========== 辅助功能 ==========
 function describePlayer() {
   const stats = state.playerStats;
@@ -1015,7 +1022,7 @@ function triggerEnding(forced = '') {
       
       // 全新逻辑：第一幕结束，直接恢复所有状态
       state.act1 = initStage(); 
-      updateRedVignette();
+      clearRedVignette(); // 强制清除红光
 
       openInterlude();
     };
@@ -1025,7 +1032,7 @@ function triggerEnding(forced = '') {
       btn.onclick = () => {
         document.getElementById('endingOverlay').style.display = 'none';
         state.camp = initStage();
-        updateRedVignette();
+        clearRedVignette();
         playRound(1);
       };
     } else {
@@ -1037,7 +1044,7 @@ function triggerEnding(forced = '') {
         
         // 战役结束，恢复所有状态
         state.camp = initStage();
-        updateRedVignette();
+        clearRedVignette();
 
         openInterlude();
       };
@@ -1048,6 +1055,7 @@ function triggerEnding(forced = '') {
 }
 
 function openInterlude() {
+  clearRedVignette(); // 确保面板一打开就是正常颜色
   document.getElementById('interludeOverlay').style.display = 'flex';
   document.getElementById('intExp').textContent = `经验：${state.exp}　心气：${state.will}`;
   
@@ -1083,6 +1091,7 @@ function startCampaign(key) {
   
   // 开始新战役，重置满状态
   state.camp = initStage();
+  clearRedVignette();
   
   playRound(1);
 }
