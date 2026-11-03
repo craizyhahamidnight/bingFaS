@@ -701,6 +701,15 @@ function clearRedVignette() {
   document.body.classList.remove('warning', 'danger');
 }
 
+// 统一控制兵法按钮的显示
+function syncGuideBtn() {
+  if (state.isGuided) {
+    document.getElementById('guideBtn').style.display = 'block';
+  } else {
+    document.getElementById('guideBtn').style.display = 'none';
+  }
+}
+
 // ========== 辅助功能 ==========
 function describePlayer() {
   const stats = state.playerStats;
@@ -969,6 +978,7 @@ function playRound(roundNum) {
   stage.currentRound = roundNum;
   state.forcedBet = false;
   state.rethought = false;
+  syncGuideBtn(); // 确保进入每一轮都同步按钮状态
 
   let data;
   if (state.phase === 'act1') data = act1Content[roundNum];
@@ -1020,9 +1030,8 @@ function triggerEnding(forced = '') {
       document.getElementById('endingOverlay').style.display = 'none';
       state.phase = 'interlude';
       
-      // 全新逻辑：第一幕结束，直接恢复所有状态
       state.act1 = initStage(); 
-      clearRedVignette(); // 强制清除红光
+      clearRedVignette();
 
       openInterlude();
     };
@@ -1042,7 +1051,6 @@ function triggerEnding(forced = '') {
         document.getElementById('endingOverlay').style.display = 'none';
         state.phase = 'interlude';
         
-        // 战役结束，恢复所有状态
         state.camp = initStage();
         clearRedVignette();
 
@@ -1055,7 +1063,8 @@ function triggerEnding(forced = '') {
 }
 
 function openInterlude() {
-  clearRedVignette(); // 确保面板一打开就是正常颜色
+  clearRedVignette();
+  syncGuideBtn(); // 确保休整时按钮状态正确
   document.getElementById('interludeOverlay').style.display = 'flex';
   document.getElementById('intExp').textContent = `经验：${state.exp}　心气：${state.will}`;
   
@@ -1083,15 +1092,15 @@ function openInterlude() {
 }
 
 function startCampaign(key) {
-  if (key === 'food' || key === 'court') return; // 二次防护
+  if (key === 'food' || key === 'court') return;
   
   document.getElementById('interludeOverlay').style.display = 'none';
   state.phase = 'campaign';
   state.currentCampaign = key;
   
-  // 开始新战役，重置满状态
   state.camp = initStage();
   clearRedVignette();
+  syncGuideBtn(); // 开启新战役时，保证兵法按钮在
   
   playRound(1);
 }
@@ -1109,9 +1118,7 @@ document.getElementById('loadBtn').onclick = () => {
     document.getElementById('startScreen').style.display = 'none';
     document.getElementById('gameScreen').style.display = 'block';
     
-    if (state.isGuided) {
-      document.getElementById('guideBtn').style.display = 'block';
-    }
+    syncGuideBtn(); // 读档时恢复按钮
 
     if (state.phase === 'interlude') {
       openInterlude();
@@ -1130,6 +1137,7 @@ document.getElementById('startNormalBtn').onclick = () => {
   state.act1 = initStage();
   document.getElementById('startScreen').style.display = 'none';
   document.getElementById('gameScreen').style.display = 'block';
+  syncGuideBtn();
   startBgm();
   requestAnimationFrame(checkTicks);
   playRound(1);
@@ -1141,7 +1149,7 @@ document.getElementById('startGuideBtn').onclick = () => {
   state.act1 = initStage();
   document.getElementById('startScreen').style.display = 'none';
   document.getElementById('gameScreen').style.display = 'block';
-  document.getElementById('guideBtn').style.display = 'block';
+  syncGuideBtn();
   startBgm();
   requestAnimationFrame(checkTicks);
   playRound(1);
