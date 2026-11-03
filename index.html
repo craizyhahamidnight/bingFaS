@@ -89,6 +89,26 @@
   .bet-action-btn:hover { border-color:#8a7d6b; }
   .bet-action-btn.primary { border-color:#b85c4a; color:#e8b0a0; }
   .bet-action-btn.primary:hover { background:#b85c4a; color:#1a1714; }
+  .bet-action-btn.locked { opacity:0.5; }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-6px); }
+    40% { transform: translateX(6px); }
+    60% { transform: translateX(-4px); }
+    80% { transform: translateX(4px); }
+  }
+  .shake { animation: shake 0.4s ease; }
+
+  #warningMsg {
+    display:none;
+    color:#e04838;
+    font-size:18px;
+    margin-top:14px;
+    letter-spacing:2px;
+    font-weight:bold;
+    text-shadow: 0 0 12px rgba(224,72,56,0.6);
+  }
 
   #result { display:none; margin-top:30px; font-size:17px; line-height:2; }
   #result p { margin-bottom:14px; }
@@ -233,6 +253,7 @@ const audioStatus = document.getElementById('audioStatus');
 
 let markIndex = 0;
 let lastBgmTime = 0;
+let fastHeartbeatInterval = null;
 
 function showAudioStatus(msg) {
   audioStatus.textContent = msg;
@@ -269,10 +290,11 @@ function checkTicks() {
   requestAnimationFrame(checkTicks);
 }
 
+// 音乐节奏点触发：心脏只在平静时跳。
+// 激动时，心脏由 fastHeartbeatInterval 驱动，但 markIndex 仍在后台推进。
 function onTick() {
-  pulseHeart();
-  if (state.heartExcited) {
-    playHeartbeatSfx();
+  if (!state.heartExcited) {
+    pulseHeart();
   }
 }
 
@@ -280,7 +302,7 @@ function pulseHeart() {
   const anim = state.heartExcited ? 'pulseBig' : 'pulseSmall';
   heart.style.animation = 'none';
   void heart.offsetHeight;
-  heart.style.animation = anim + ' 0.25s ease-out';
+  heart.style.animation = anim + ' 0.2s ease-out';
 }
 
 function playHeartbeatSfx() {
@@ -293,14 +315,26 @@ function playHeartbeatSfx() {
 
 function setHeartExcited(excited) {
   state.heartExcited = excited;
+
   if (excited) {
     heart.classList.remove('calm');
     heart.classList.add('excited');
     heart.src = 'https://cdn.phototourl.com/member/2026-11-02-782fd5c5-d6e4-4606-89a4-db5b7451ba16.png';
+
+    if (fastHeartbeatInterval) clearInterval(fastHeartbeatInterval);
+    fastHeartbeatInterval = setInterval(() => {
+      pulseHeart();
+      playHeartbeatSfx();
+    }, 280);
   } else {
     heart.classList.remove('excited');
     heart.classList.add('calm');
     heart.src = 'https://cdn.phototourl.com/member/2026-11-02-36a5566b-457c-4986-b715-dc7cb965661d.png';
+
+    if (fastHeartbeatInterval) {
+      clearInterval(fastHeartbeatInterval);
+      fastHeartbeatInterval = null;
+    }
   }
 }
 
@@ -397,32 +431,55 @@ function showChoices(choices) {
   });
 }
 
+let currentChoice = null;
+
 function onChoiceClick(choice) {
   if (state.forcedBet) return;
+  currentChoice = choice;
   choicesEl.style.display = 'none';
   betPanelEl.style.display = 'block';
+
+  const locked = state.rethought; // 已经再想想过了
+
   betPanelEl.innerHTML =
     '<div class="bet-title">你确定吗？</div>' +
     '<div class="bet-good">如果赌对：' + choice.betGood + '</div>' +
     '<div class="bet-bad">如果赌错：' + choice.betBad + '</div>' +
     '<div class="bet-actions">' +
       '<button class="bet-action-btn primary" id="betConfirm">下注</button>' +
-      '<button class="bet-action-btn" id="betThink">再想想</button>' +
-    '</div>';
+      '<button class="bet-action-btn' + (locked ? ' locked' : '') + '" id="betThink">再想想</button>' +
+    '</div>' +
+    '<div id="warningMsg">主帅，请做出决定！！！</div>';
+
   document.getElementById('betConfirm').onclick = () => confirmBet(choice);
-  document.getElementById('betThink').onclick = () => rethink(choice);
+  document.getElementById('betThink').onclick = () => {
+    if (state.rethought) {
+      const warn = document.getElementById('warningMsg');
+      warn.style.display = 'block';
+      betPanelEl.classList.remove('shake');
+      void betPanelEl.offsetHeight;
+      betPanelEl.classList.add('shake');
+      // 警告闪一下
+      warn.style.opacity = '0';
+      setTimeout(() => { warn.style.transition = 'opacity 0.2s'; warn.style.opacity = '1'; }, 10);
+    } else {
+      rethink();
+    }
+  };
 }
 
 function rethink() {
   state.rethought = true;
   setHeartExcited(true);
   betPanelEl.style.display = 'none';
+  betPanelEl.classList.remove('shake');
   choicesEl.style.display = 'flex';
 }
 
 function confirmBet(choice) {
   state.forcedBet = true;
   betPanelEl.style.display = 'none';
+  betPanelEl.classList.remove('shake');
   setHeartExcited(false);
   const win = Math.random() < 0.6;
   showResult(choice, win);
