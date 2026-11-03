@@ -7,6 +7,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
+  /* CSS 完全保持原样 */
   * { margin:0; padding:0; box-sizing:border-box; }
   body {
     background:#1a1714; color:#d4c9b8; font-family:"KaiTi","STKaiti","楷体",serif;
@@ -15,7 +16,6 @@
   body.warning { background:#2a1512; }
   body.danger { background:#3a0e0a; }
 
-  /* 顶部按钮 */
   #topControls { position:fixed; top:15px; right:20px; z-index:200; display:flex; gap:10px; }
   .top-btn {
     background:rgba(31,26,20,0.9); border:1px solid #4a3f32; color:#8a7d6b;
@@ -23,7 +23,6 @@
   }
   .top-btn:hover { border-color:#8a7d6b; color:#d4c9b8; }
 
-  /* 开始界面 */
   #startScreen {
     position:fixed; inset:0; z-index:100; display:flex; flex-direction:column;
     align-items:center; justify-content:center; background:#1a1714; gap:15px;
@@ -267,7 +266,6 @@
 
 <div id="tutorialTip">点击【记下】把数字记入笔记。<br>不记也不会死，但记混了别怪军师。</div>
 
-<!-- NPC -->
 <div id="npcOverlay">
   <div id="npcPanel">
     <button class="close-btn" id="npcClose">×</button>
@@ -279,7 +277,6 @@
   </div>
 </div>
 
-<!-- 属性 -->
 <div id="statsOverlay">
   <div id="statsPanel">
     <button class="close-btn" id="statsClose">×</button>
@@ -291,16 +288,15 @@
   </div>
 </div>
 
-<!-- 幕间 -->
 <div id="interludeOverlay">
   <div id="interludePanel">
     <h2>战后休整</h2>
     <div class="stats-exp" id="intExp" style="margin-bottom:20px;">经验：0　心气：0</div>
-    <p class="int-desc">B军退去，青石城迎来了短暂的安宁。<br>你凭借此战积攒了威望，但天下大势未定。<br>请选择接下来的行动：</p>
+    <p class="int-desc">B军退去，青石城迎来了短暂的安宁。伤兵在营中哀嚎，活下来的人在修补城墙。<br>百姓们送来了一些粗粮，军心和民心正在缓慢恢复。<br>请选择接下来的行动：</p>
     <div class="campaign-list">
       <button class="campaign-btn" id="btn-chase">追击战：穷寇莫追<small>痛打落水狗，但小心困兽犹斗。</small></button>
-      <button class="campaign-btn" id="btn-food">夺粮战：断其命脉<small>深入敌后，烧毁敌军粮草。</small></button>
-      <button class="campaign-btn" id="btn-court">朝堂战：后院起火<small>面对钦差，你该如何保住兵权？</small></button>
+      <button class="campaign-btn" id="btn-food">夺粮战：断其命脉<small>（军情司正在加急编写战报，暂未解锁）</small></button>
+      <button class="campaign-btn" id="btn-court">朝堂战：后院起火<small>（军情司正在加急编写战报，暂未解锁）</small></button>
     </div>
     <div id="allCompleteMsg" style="display:none; color:#d4a85a; margin-top:20px; font-size:18px;">
       所有战役已通关！青石城威震天下！
@@ -308,7 +304,6 @@
   </div>
 </div>
 
-<!-- 结局 -->
 <div id="endingOverlay">
   <div id="endingPanel">
     <h2 id="endingTitle"></h2>
@@ -439,7 +434,7 @@ function getStatColor(v) {
 
 // ========== 全局状态 ==========
 let state = {
-  phase: 'start', // start, act1, interlude, campaign, ending
+  phase: 'start',
   isGuided: false,
   heartExcited: false,
   forcedBet: false,
@@ -694,7 +689,7 @@ function updateRedVignette() {
   const v = document.getElementById('redVignette');
   const body = document.body;
   body.classList.remove('warning', 'danger');
-  if (stage.morale === 0) v.style.opacity = 0;
+  if (!stage || stage.morale === 0) v.style.opacity = 0;
   else if (stage.morale === 1) { v.style.opacity = 0.3; body.classList.add('warning'); }
   else if (stage.morale === 2) { v.style.opacity = 0.6; body.classList.add('danger'); }
   else { v.style.opacity = 0.9; body.classList.add('danger'); }
@@ -797,7 +792,7 @@ function renderGuide() {
   document.getElementById('guideTitle').textContent = `兵法 · 第${['一','二','三','四','五'][r-1]}轮`;
   let html = '';
   if (state.phase === 'act1') {
-    if (r === 1) html += `<div class="advice">《三十六计》云：虚则实之，实则虚之。东门喊得响，大概率是诱饵。把主力藏在南门，赌他一把。<br><span class="highlight">推荐：选 A。</span></div>`;
+    if (r === 1) html += `<div class="advice">《三十六计》云：虚则实之，实则虚之。东门喊得响，大概率是诱饵。<br><span class="highlight">推荐：选 A。</span></div>`;
     else if (r === 2) html += `<div class="advice">《孙子》云：兵者，诡道也。这很可能是佯动，逼你分兵。<br><span class="highlight">推荐：选 B。</span></div>`;
     else if (r === 3) html += `<div class="advice">《孙子》云：亲而离之。利用马副将的贪功。<br><span class="highlight">推荐：选 A、B 均可。</span></div>`;
     else if (r === 4) html += `<div class="advice">《兵法》云：三军可夺气。亲自登城，能稳军心。<br><span class="highlight">推荐：选 A。</span></div>`;
@@ -808,7 +803,7 @@ function renderGuide() {
   document.getElementById('guideContent').innerHTML = html;
 }
 
-// ========== 剧情数据 ==========
+// ========== 剧情数据（第一部原封不动） ==========
 const act1Content = {
   1: {
     intro: [
@@ -903,115 +898,65 @@ const act1Content = {
   }
 };
 
+// ========== 剧情数据（第二部：追击战精修版） ==========
 const campaignContent = {
   'chase': {
     name: '追击战：穷寇莫追',
     statsName: { morale: '军纪', civilMorale: '体力' },
     1: {
       intro: [
-        { type:'narration', text:'B军退走。老陈来报："主将，B军走得很慢，车上装满了抢来的辎重。"' },
-        { type:'speaker', name:'赵将军', text:'主将！追吧！扔了重甲，轻装突袭！' },
-        { type:'speaker', name:'周先生', text:'不可。兵法云，穷寇莫追。追得太急，阵型必乱。' },
+        { type:'narration', text:'次日。城外的风里还带着血腥味；士兵正修补着城墙，每个人脸上都带着劫后余生的疲惫。' },
+        { type:'speaker', name:'老陈', text:'主将。B军走得很慢；他们没走大道，而是沿着河谷在走。斥候摸近些看了，车上装满了从咱们周边村镇抢来的粮草、布匹、还有十几口猪。队伍拉得老长，首尾不能相顾。' },
+        { type:'speaker', name:'赵将军', text:'主将！天赐良机啊！他们带着这么多累赘，指定跑不快——让我带两千轻骑去追，扔了重甲，绝对能把他们咬下一块肉来，不能让他们白抢啊！' },
+        { type:'speaker', name:'周先生', text:'赵将军，你把事情想得太简单了。' },
+        { type:'speaker', name:'赵将军', text:'周老军师莫不是人老，胆也老了？' },
+        { type:'speaker', name:'周先生', text:'赵将军此言差矣；韩主将用兵可最善断后。河谷两边全是土坡，若他们故意放慢速度，在半路设了口袋阵呢？就等着你这军钻进去。两千轻骑？呵，给韩主将塞牙缝都不够。不如按兵不动；毕竟留得青山在，不怕没柴烧。' },
+        { type:'speaker', name:'副将李', text:'老军师所言极是。' },
+        { type:'speaker', name:'赵将军', text:'切。' },
+        { type:'speaker', name:'副将李', text:'但若放任他们带着辎重从容退走，城中百姓怕是会心寒呐。主将，若追，我们不能全军压上，也不能孤军深入。必须步步为营。我提议分兵两路包抄，以截断敌方退路。' },
+        { type:'thought', text:'你皱眉看着地图，听着外面的风声。追，可能中埋伏；不追，军心民意却难平。' },
       ],
       choices: [
-        { id:'A', text:'全军卸甲，急追。', betGood:'追上了，抢回辎重。', betBad:'阵型大乱，被反咬一口。', winChance:0.5, statChanges:{ 胆识:1, 统率:-1 }, resultGood:'追上了B军尾部，杀伤两千。', resultBad:'B军突然回头，我军大乱，死伤两千。', effectsGood:{ morale:-1, civilMorale:1 }, effectsBad:{ troops:-2000, morale:-2 } },
-        { id:'B', text:'结阵稳步推进。', betGood:'稳扎稳打。', betBad:'速度太慢，B军跑了。', winChance:0.7, statChanges:{ 统率:1 }, resultGood:'救回了被掳的百姓，军纪严明。', resultBad:'追到半路，B军已经过了河。', effectsGood:{ morale:1, civilMorale:1 }, effectsBad:{ civilMorale:1 } },
-        { id:'C', text:'分兵两路包抄。', betGood:'截断退路。', betBad:'被各个击破。', winChance:0.6, statChanges:{ 智谋:1 }, resultGood:'包抄成功，吃掉B军后军。', resultBad:'被韩主将识破，副将李那一路损失惨重。', effectsGood:{ troops:-200, civilMorale:1 }, effectsBad:{ troops:-1500, morale:-1 } }
+        { id:'A', text:'听赵将军的，卸下重甲，全军急追。', betGood:'追上了，抢回辎重，大获全胜。', betBad:'阵型大乱，被反咬一口，死伤惨重。', winChance:0.5, statChanges:{ 胆识:1, 统率:-1 }, resultGood:'B军确实没设伏。你带着轻骑追上，像切豆腐一样切断了他们的后队。不仅抢回了被掠夺的物资，还杀伤了近两千敌军。百姓夹道欢迎。', resultBad:'你刚冲进河谷，两边山丘上竖起密密麻麻的B军旗帜。马副将带伏兵杀出，轻骑无甲，瞬间溃散。死伤两千人，你狼狈回城。', effectsGood:{ morale:-1, civilMorale:1 }, effectsBad:{ troops:-2000, morale:-2 } },
+        { id:'B', text:'听周先生的，按兵不动，只防不追。', betGood:'稳扎稳打，保存了实力。', betBad:'速度太慢，B军跑了，城里民心受挫。', winChance:0.7, statChanges:{ 统率:1 }, resultGood:'你下令紧闭城门。虽然B军跑了，但你保住了这几千残兵。周先生点头：留得青山在，不怕没柴烧。', resultBad:'你按兵不动，B军安全撤退。城中百姓看着被掠夺一空的村镇，窃窃私语：主将是不是怕了？民心动摇。', effectsGood:{ morale:1, civilMorale:1 }, effectsBad:{ civilMorale:1 } },
+        { id:'C', text:'听副将李的，分兵两路包抄，截断退路。', betGood:'完美包抄，吃掉B军后军。', betBad:'被韩主将识破，副将李折损。', winChance:0.6, statChanges:{ 智谋:1 }, resultGood:'副将李的包抄大获成功。B军首尾不能相顾，后军被吃，俘虏数百人，辎重全部夺回。', resultBad:'韩主将看穿你的分兵意图，集中兵力猛攻副将李那一路。副将李拼死杀出，损失一千五百人。', effectsGood:{ troops:-200, civilMorale:1 }, effectsBad:{ troops:-1500, morale:-1 } }
       ]
     },
     2: {
       intro: [
-        { type:'narration', text:'追到断魂谷。两边是高山，中间只有一条窄路。' },
-        { type:'speaker', name:'老陈', text:'主将，谷里静得可怕。' },
+        { type:'narration', text:'你带兵追出三十里。前方是断魂谷，两边山壁陡峭如削，只有一条窄路。地上散落着翻倒的驴车和丢弃的B军旗帜。' },
+        { type:'speaker', name:'老陈', text:'主将，这谷里静得可怕，连只鸟叫都没有。而且谷口有几道新鲜的车辙印，是往两边山腰上拐的。' },
+        { type:'speaker', name:'赵将军', text:'怕什么！他们肯定是怕追上，把车扔了，人从小路跑了！主将，赶紧冲过去！' },
+        { type:'speaker', name:'周先生', text:'赵将军，你仔细看那车辙印。如果是逃跑，印子该朝上。但谷口的印子是朝下的。这说明，有东西从山上运下来了。也许该上山一探。' },
+        { type:'speaker', name:'副将李', text:'军师的意思是，滚石？或者火油？那确实该——' },
+        { type:'speaker', name:'赵将军', text:'可万一他们直接跑了，就赶不上了！' },
+        { type:'speaker', name:'老陈', text:'赵将军莫急；周先生所言并非无理。' },
+        { type:'thought', text:'你看着峡谷上方幽深的密林。若有伏兵，一把火，或者砸下滚石，进去的人全成肉泥。' },
       ],
       choices: [
-        { id:'A', text:'直接冲进去。', betGood:'没有伏兵。', betBad:'中埋伏了。', winChance:0.4, statChanges:{ 胆识:1 }, resultGood:'顺利穿过山谷。', resultBad:'滚石落下，死伤惨重。', effectsGood:{ civilMorale:1 }, effectsBad:{ troops:-3000, morale:-2 } },
-        { id:'B', text:'派斥候攀岩探查。', betGood:'发现伏兵，将计就计。', betBad:'浪费时间，体力下降。', winChance:0.7, statChanges:{ 智谋:1 }, resultGood:'发现了马副将的伏兵，反杀一波。', resultBad:'什么都没发现，大家在谷口等了半天，体力透支。', effectsGood:{ troops:-200, morale:1 }, effectsBad:{ civilMorale:-1 } },
-        { id:'C', text:'放火烧山。', betGood:'把伏兵烧出来。', betBad:'烧到自己人，且失了民心。', winChance:0.5, statChanges:{ 果断:1, 威望:-1 }, resultGood:'伏兵被大火逼出，被全歼。', resultBad:'风向突变，大火烧了自家粮草。', effectsGood:{ troops:-300 }, effectsBad:{ troops:-800, civilMorale:-2 } }
+        { id:'A', text:'赌一把，全军直接冲过峡谷。', betGood:'没有伏兵，顺利穿过。', betBad:'中埋伏了，滚石落下，死伤惨重。', winChance:0.4, statChanges:{ 胆识:1 }, resultGood:'你赌赢了。大军心惊胆战穿过峡谷，什么也没发生。出了一身冷汗，但没死人。', resultBad:'大军刚到峡谷中间，两边巨响。滚石砸下，士兵被碾成肉泥。丢下三千具尸体才逃出峡谷。', effectsGood:{ civilMorale:1 }, effectsBad:{ troops:-3000, morale:-2 } },
+        { id:'B', text:'听老陈的，派斥候攀岩上去探查。', betGood:'发现伏兵，将计就计，反杀一波。', betBad:'浪费时间，体力下降。', winChance:0.7, statChanges:{ 智谋:1 }, resultGood:'老陈带猎户攀上悬崖，发现了伏兵。你将计就计，引诱露头，弓弩齐发，伏兵死伤殆尽。', resultBad:'斥候摸了半天没发现伏兵。大军等了两个时辰，人困马乏，体力透支。', effectsGood:{ troops:-200, morale:1 }, effectsBad:{ civilMorale:-1 } },
+        { id:'C', text:'听赵将军的，放火烧山。', betGood:'把伏兵烧出来，全歼之。', betBad:'风向突变，大火烧了自家粮草，失了民心。', winChance:0.5, statChanges:{ 果断:1, 威望:-1 }, resultGood:'你下令放火。火势烧透半座山，逼出马副将和伏兵。你在谷口以逸待劳，将他们全歼。', resultBad:'风向突变。火没烧到伏兵，反烧了你的部分粮草。附近村民看着被烧毁的山林，大哭不止。', effectsGood:{ troops:-300 }, effectsBad:{ troops:-800, civilMorale:-2 } }
       ]
     },
     3: {
       intro: [
-        { type:'narration', text:'追上了马副将的断后部队。马副将就在阵前。' },
+        { type:'narration', text:'终于追上B军断后部队。约三千人，马副将的旗号。阵前停着几十辆装满金银的马车，但他身后的士兵面如死灰。' },
+        { type:'speaker', name:'赵将军', text:'主将！！就是这狗贼！！让我去跟他单挑，我要砍下他的脑袋当夜壶！！！' },
+        { type:'speaker', name:'周先生', text:'赵将军确实勇猛；但马副将贪生怕死，此时没跑而是拿金银做诱饵，你想是为何？我们一冲，前后则乱；他必趁乱溜走。' },
+        { type:'speaker', name:'副将李', text:'军师所言极是。不如阵前喊话，告诉他们韩主将已经抛弃了他们。B军士气低落，也许不战自溃，可省半数箭矢。' },
+        { type:'speaker', name:'周先生', text:'但此仍旧不如全面围攻稳妥。' },
       ],
       choices: [
-        { id:'A', text:'派赵将军单挑马副将。', betGood:'赵将军斩将夺旗。', betBad:'赵将军被生擒。', winChance:0.5, statChanges:{ 胆识:1, 统率:-1 }, resultGood:'赵将军一刀砍断马副将的马腿。', resultBad:'赵将军中计被围，你只能收兵。', effectsGood:{ morale:2 }, effectsBad:{ troops:-1000, morale:-1 } },
-        { id:'B', text:'万箭齐发，直接覆盖。', betGood:'不管三七二十一，射死完事。', betBad:'消耗太多箭矢。', winChance:0.8, statChanges:{ 果断:1 }, resultGood:'马副将被射成刺猬。', resultBad:'箭射光了，对面没死几个。', effectsGood:{ troops:-100 }, effectsBad:{ civilMorale:-1 } },
-        { id:'C', text:'阵前喊话，瓦解敌军。', betGood:'B军投降。', betBad:'人家根本不理你。', winChance:0.6, statChanges:{ 威望:1, 智谋:1 }, resultGood:'B军本就是抓来的壮丁，纷纷倒戈。', resultBad:'马副将杀了几个逃兵，稳住了阵脚。', effectsGood:{ morale:1, civilMorale:1 }, effectsBad:{ civilMorale:-1 } }
+        { id:'A', text:'让赵将军出战，正面击溃马副将。', betGood:'赵将军斩将夺旗。', betBad:'赵将军被生擒，士气大跌。', winChance:0.5, statChanges:{ 胆识:1, 统率:-1 }, resultGood:'赵将军直取马副将，十回合砍断马腿生擒活捉。B军投降。', resultBad:'赵将军冲得太猛，马副将突然放箭。战马被射倒，赵将军被生擒。你投鼠忌器。', effectsGood:{ morale:2 }, effectsBad:{ troops:-1000, morale:-1 } },
+        { id:'B', text:'听周先生的，全军万箭齐发。', betGood:'万箭齐发，全歼敌军。', betBad:'消耗太多箭矢，且没抓到马副将。', winChance:0.8, statChanges:{ 果断:1 }, resultGood:'你下令放箭。漫天箭雨遮蔽天空，马副将等人来不及举盾被射成刺猬，三千人全军覆没。', resultBad:'马副将躲马车底下趁乱换衣逃走。箭矢消耗大半。', effectsGood:{ troops:-100 }, effectsBad:{ civilMorale:-1 } },
+        { id:'C', text:'听副将李的，阵前喊话。', betGood:'B军投降，不战而屈人之兵。', betBad:'人家根本不理你，反而激发了他们同仇敌忾。', winChance:0.6, statChanges:{ 威望:1, 智谋:1 }, resultGood:'你亲自喊话，B军面面相觑，不知谁先放下长枪，三千人跪地请降。', resultBad:'马副将大笑挑拨离间，B军爆发惊人战力，拼命突围而去。', effectsGood:{ morale:1, civilMorale:1 }, effectsBad:{ civilMorale:-1 } }
       ]
     }
   },
-  'food': {
-    name: '夺粮战：断其命脉',
-    statsName: { morale: '隐蔽', civilMorale: '时间' },
-    1: {
-      intro: [
-        { type:'narration', text:'韩主将退守断魂谷，但粮草囤在谷外小镇。你要去烧粮。' },
-        { type:'speaker', name:'周先生', text:'必须把韩主将的注意力引开。' },
-      ],
-      choices: [
-        { id:'A', text:'正面佯攻断魂谷。', betGood:'韩主将中计。', betBad:'暴露意图。', winChance:0.6, statChanges:{ 统率:1 }, resultGood:'韩主将以为你要决战，死守谷口。', resultBad:'韩主将看出你兵力不足，按兵不动。', effectsGood:{ morale:1 }, effectsBad:{ civilMorale:-1 } },
-        { id:'B', text:'在山中多设旌旗，虚张声势。', betGood:'吓得韩主将不敢动。', betBad:'被识破。', winChance:0.6, statChanges:{ 智谋:1 }, resultGood:'韩主将以为被十万大军包围。', resultBad:'韩主将冷笑："虚则虚之，不用管。"', effectsGood:{ morale:1 }, effectsBad:{ civilMorale:-1 } },
-        { id:'C', text:'派老陈去截断B军斥候。', betGood:'瞎子韩主将。', betBad:'老陈失手。', winChance:0.7, statChanges:{ 果断:1 }, resultGood:'B军成了聋子瞎子。', resultBad:'老陈负伤，计划暴露。', effectsGood:{ morale:1 }, effectsBad:{ troops:-500, morale:-1 } }
-      ]
-    },
-    2: {
-      intro: [
-        { type:'narration', text:'佯攻奏效。现在要派人去烧粮。' },
-      ],
-      choices: [
-        { id:'A', text:'派赵将军去。', betGood:'他冲得猛，烧得快。', betBad:'他可能去抢粮食。', winChance:0.5, statChanges:{ 胆识:1 }, resultGood:'一把火烧了粮仓。', resultBad:'赵将军见钱眼开，去抢银子被包围。', effectsGood:{ morale:1 }, effectsBad:{ troops:-1500, morale:-1 } },
-        { id:'B', text:'派副将李去。', betGood:'纪律严明。', betBad:'速度太慢。', winChance:0.8, statChanges:{ 统率:1 }, resultGood:'烧了粮草，秋毫无犯。', resultBad:'行动迟缓，被B军回援发现。', effectsGood:{ civilMorale:1, morale:1 }, effectsBad:{ troops:-800, civilMorale:-1 } },
-        { id:'C', text:'派老陈带火油去。', betGood:'神不知鬼不觉。', betBad:'人太少，打不过守军。', winChance:0.6, statChanges:{ 智谋:1 }, resultGood:'悄无声息烧了粮仓。', resultBad:'被守军发现，老陈死战逃脱。', effectsGood:{ morale:2 }, effectsBad:{ troops:-500, morale:-1 } }
-      ]
-    },
-    3: {
-      intro: [
-        { type:'narration', text:'大火烧起！韩主将带兵杀回来了！' },
-      ],
-      choices: [
-        { id:'A', text:'回身死战。', betGood:'击退韩主将。', betBad:'全军覆没。', winChance:0.5, statChanges:{ 胆识:1, 统率:1 }, resultGood:'B军无粮，无心恋战，溃退。', resultBad:'韩主将发疯般反扑，你被全歼。', effectsGood:{ morale:2 }, effectsBad:{ troops:-3000, morale:-2 } },
-        { id:'B', text:'丢掉重甲，分路撤退。', betGood:'保全主力。', betBad:'被衔尾追杀。', winChance:0.7, statChanges:{ 果断:1 }, resultGood:'化整为零，逃出包围圈。', resultBad:'B军骑兵追杀，损失惨重。', effectsGood:{ troops:-500 }, effectsBad:{ troops:-2000, morale:-1 } },
-        { id:'C', text:'派赵将军断后。', betGood:'赵将军死守。', betBad:'赵将军战死。', winChance:0.5, statChanges:{ 威望:1 }, resultGood:'赵将军挡住了韩主将。', resultBad:'赵将军身负重伤。', effectsGood:{ troops:-1000, morale:1 }, effectsBad:{ troops:-2000, morale:-2 } }
-      ]
-    }
-  },
-  'court': {
-    name: '朝堂战：后院起火',
-    statsName: { morale: '军心', civilMorale: '圣眷' },
-    1: {
-      intro: [
-        { type:'narration', text:'刚打退B军，朝廷钦差到了。' },
-        { type:'speaker', name:'钦差大臣', text:'大胆守将！有人参你养寇自重，还不快交出虎符！' },
-      ],
-      choices: [
-        { id:'A', text:'送上金银，低声下气。', betGood:'钦差笑纳。', betBad:'被当成心虚，狮子大开口。', winChance:0.5, statChanges:{ 智谋:1, 威望:-1 }, resultGood:'钦差答应在皇上面前美言几句。', resultBad:'钦差觉得你好欺负，索要十万两。', effectsGood:{ civilMorale:1 }, effectsBad:{ civilMorale:-1, morale:-1 } },
-        { id:'B', text:'亮出刀剑，武力威慑。', betGood:'钦差吓破胆。', betBad:'被参一本，直接被定为反贼。', winChance:0.5, statChanges:{ 胆识:1, 智谋:-1 }, resultGood:'钦差吓得连夜跑了。', resultBad:'钦差连夜上奏，大军压境。', effectsGood:{ civilMorale:1 }, effectsBad:{ civilMorale:-2, troops:-1000 } },
-        { id:'C', text:'拿出阵亡将士名单，以情动之。', betGood:'钦差动容。', betBad:'钦差是个冷血动物。', winChance:0.6, statChanges:{ 威望:1, 统率:1 }, resultGood:'钦差叹口气，决定如实上报。', resultBad:'钦差冷笑："死几个兵算什么？"', effectsGood:{ morale:1, civilMorale:1 }, effectsBad:{ morale:-1, civilMorale:-1 } }
-      ]
-    },
-    2: {
-      intro: [
-        { type:'narration', text:'钦差在营中作威作福，士兵们怨声载道。' },
-      ],
-      choices: [
-        { id:'A', text:'忍气吞声，严格约束部下。', betGood:'没有把柄。', betBad:'士兵愤怒。', winChance:0.7, statChanges:{ 统率:1, 果断:-1 }, resultGood:'钦差挑不出毛病。', resultBad:'有士兵偷偷打了钦差，你背锅。', effectsGood:{ civilMorale:1 }, effectsBad:{ morale:-1, civilMorale:-1 } },
-        { id:'B', text:'暗中指使赵将军去吓唬他。', betGood:'钦差老实了。', betBad:'赵将军演技太差被抓。', winChance:0.5, statChanges:{ 智谋:1, 胆识:1 }, resultGood:'钦差称病不出。', resultBad:'赵将军被钦差抓个正着。', effectsGood:{ morale:1, civilMorale:1 }, effectsBad:{ morale:-1, civilMorale:-2 } },
-        { id:'C', text:'把钦差请到城头，看B军尸体。', betGood:'震慑钦差。', betBad:'钦差更觉得你是个屠夫。', winChance:0.6, statChanges:{ 威望:1 }, resultGood:'钦差腿软了。', resultBad:'钦差回去上奏你残暴不仁。', effectsGood:{ civilMorale:1 }, effectsBad:{ civilMorale:-1 } }
-      ]
-    },
-    3: {
-      intro: [
-        { type:'narration', text:'钦差拿出了圣旨。' },
-        { type:'speaker', name:'钦差大臣', text:'奉天承运，皇帝诏曰：即刻交出青石城防务，进京述职！' },
-      ],
-      choices: [
-        { id:'A', text:'交出虎符，只身进京。', betGood:'保全名节。', betBad:'被下狱处死。', winChance:0.5, statChanges:{ 忠诚:1, 果断:-1 }, resultGood:'朝廷查明真相，升你为兵部侍郎。', resultBad:'一进京就被下狱，罪名是通敌。', effectsGood:{ civilMorale:1 }, effectsBad:{ morale:-2, civilMorale:-1 } },
-        { id:'B', text:'当场抗旨，斩杀钦差。', betGood:'彻底独立。', betBad:'成为叛军。', winChance:0.5, statChanges:{ 胆识:2, 威望:-1 }, resultGood:'你成为了割据一方的军阀。', resultBad:'朝廷十万大军讨伐，青石城万劫不复。', effectsGood:{ morale:2 }, effectsBad:{ morale:-3 } },
-        { id:'C', text:'伪造B军入寇，强行留任。', betGood:'朝廷同意你继续守城。', betBad:'被识破，满门抄斩。', winChance:0.6, statChanges:{ 智谋:1, 果断:1 }, resultGood:'朝廷赐你尚方宝剑。', resultBad:'欺君之罪，直接赐死。', effectsGood:{ morale:1, civilMorale:1 }, effectsBad:{ morale:-2 } }
-      ]
-    }
-  }
+  // 空位占位，因为 UI 锁住了
+  'food': { name: '夺粮战', 1: {}, 2: {}, 3: {} },
+  'court': { name: '朝堂战', 1: {}, 2: {}, 3: {} }
 };
 
 function playRound(roundNum) {
@@ -1069,6 +1014,13 @@ function triggerEnding(forced = '') {
     btn.onclick = () => {
       document.getElementById('endingOverlay').style.display = 'none';
       state.phase = 'interlude';
+      
+      // 修复1：休整期恢复军心/民心
+      if (state.act1.morale > 0) state.act1.morale -= 1;
+      if (state.act1.civilMorale > 0) state.act1.civilMorale -= 1;
+      // 修复2：清除红光
+      updateRedVignette();
+
       openInterlude();
     };
   } else {
@@ -1079,6 +1031,7 @@ function triggerEnding(forced = '') {
         state.camp = initStage();
         state.camp.troops = 10000;
         state.camp.food = 30;
+        updateRedVignette(); // 清除红光
         playRound(1);
       };
     } else {
@@ -1087,6 +1040,13 @@ function triggerEnding(forced = '') {
       btn.onclick = () => {
         document.getElementById('endingOverlay').style.display = 'none';
         state.phase = 'interlude';
+        
+        // 修复1：休整期恢复军心/民心
+        if (state.camp.morale > 0) state.camp.morale -= 1;
+        if (state.camp.civilMorale > 0) state.camp.civilMorale -= 1;
+        // 修复2：清除红光
+        updateRedVignette();
+
         openInterlude();
       };
     }
@@ -1105,23 +1065,27 @@ function openInterlude() {
       btn.disabled = true;
       btn.innerHTML = `已通关<small>此战役已平定。</small>`;
     } else {
-      btn.disabled = false;
-      const name = campaignContent[key].name;
-      const desc = { chase: '痛打落水狗，但小心困兽犹斗。', food: '深入敌后，烧毁敌军粮草。', court: '面对钦差，你该如何保住兵权？' }[key];
-      btn.innerHTML = `${name}<small>${desc}</small>`;
+      // 锁定另外两个战役
+      if (key === 'food' || key === 'court') {
+        btn.disabled = true;
+        btn.innerHTML = `${campaignContent[key].name}${key === 'food' ? '：断其命脉' : '：后院起火'}<small>（军情司正在加急编写战报，暂未解锁）</small>`;
+      } else {
+        btn.disabled = false;
+        const name = campaignContent[key].name;
+        const desc = { chase: '痛打落水狗，但小心困兽犹斗。', food: '深入敌后，烧毁敌军粮草。', court: '面对钦差，你该如何保住兵权？' }[key];
+        btn.innerHTML = `${name}<small>${desc}</small>`;
+      }
     }
   };
 
   setBtn('btn-chase', 'chase');
   setBtn('btn-food', 'food');
   setBtn('btn-court', 'court');
-
-  if (state.completedCampaigns.length === 3) {
-    document.getElementById('allCompleteMsg').style.display = 'block';
-  }
 }
 
 function startCampaign(key) {
+  if (key === 'food' || key === 'court') return; // 二次防护
+  
   document.getElementById('interludeOverlay').style.display = 'none';
   state.phase = 'campaign';
   state.currentCampaign = key;
