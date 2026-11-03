@@ -197,7 +197,6 @@
     border:1px solid #4a3f32; display:none;
   }
 
-  /* ========== NPC 面板 ========== */
   #npcOverlay, #statsOverlay {
     position:fixed; inset:0; z-index:150;
     background:rgba(0,0,0,0.65);
@@ -265,7 +264,6 @@
     letter-spacing:2px;
   }
 
-  /* ========== 我的属性面板 ========== */
   #statsPanel {
     text-align:center;
     padding:36px 32px 30px;
@@ -323,7 +321,6 @@
 
 <div id="tutorialTip">点击【记下】把数字记入笔记。<br>不记也不会死，但记混了别怪军师。</div>
 
-<!-- NPC 面板 -->
 <div id="npcOverlay">
   <div id="npcPanel">
     <button class="close-btn" id="npcClose">×</button>
@@ -335,7 +332,6 @@
   </div>
 </div>
 
-<!-- 我的属性面板 -->
 <div id="statsOverlay">
   <div id="statsPanel">
     <button class="close-btn" id="statsClose">×</button>
@@ -374,7 +370,6 @@ const tickMarks = [
   165.867,166.112,167.189,167.755
 ];
 
-// ========== NPC 数据 ==========
 const npcData = {
   '周先生': {
     title: 'A军军师 · 姓周',
@@ -444,7 +439,6 @@ npcOverlay.onclick = (e) => {
   if (e.target === npcOverlay) npcOverlay.style.display = 'none';
 };
 
-// ========== 状态 ==========
 const state = {
   started: false,
   heartExcited: false,
@@ -458,7 +452,6 @@ const state = {
   notes: {},
   floatedTexts: [],
   currentRound: 1,
-  // 玩家属性
   playerStats: {
     智谋: 5,
     胆识: 5,
@@ -494,10 +487,7 @@ function startBgm() {
 }
 
 function checkTicks() {
-  if (!state.started) {
-    requestAnimationFrame(checkTicks);
-    return;
-  }
+  if (!state.started) { requestAnimationFrame(checkTicks); return; }
   if (!bgm.paused) {
     const t = bgm.currentTime;
     if (t < lastBgmTime - 1) markIndex = 0;
@@ -551,7 +541,6 @@ function setHeartExcited(excited) {
   }
 }
 
-// ========== 玩家属性 ==========
 const STAT_NAMES = ['智谋','胆识','统率','威望','果断'];
 
 const STRONG_PHRASES = {
@@ -575,24 +564,16 @@ function describePlayer(stats) {
   const minV = Math.min(...vals);
   const maxV = Math.max(...vals);
   const allMid = (maxV - minV <= 1) && maxV <= 6 && minV >= 4;
-
   if (allMid) return '一个平平无奇的守将，没有特别出彩的地方，也没有明显短板。';
-
   const maxName = STAT_NAMES[vals.indexOf(maxV)];
   const minName = STAT_NAMES[vals.indexOf(minV)];
-
   const hasStrong = maxV >= 6;
   const hasWeak = minV <= 4;
-
   if (hasStrong && hasWeak && maxName !== minName) {
     return STRONG_PHRASES[maxName] + '，' + WEAK_PHRASES[minName] + '。';
   }
-  if (hasStrong) {
-    return STRONG_PHRASES[maxName] + '。';
-  }
-  if (hasWeak) {
-    return '说不上哪里好，' + WEAK_PHRASES[minName] + '。';
-  }
+  if (hasStrong) return STRONG_PHRASES[maxName] + '。';
+  if (hasWeak) return '说不上哪里好，' + WEAK_PHRASES[minName] + '。';
   return '一个平平无奇的守将。';
 }
 
@@ -600,13 +581,11 @@ function applyStatChanges(changes) {
   if (!changes) return;
   Object.entries(changes).forEach(([stat, delta]) => {
     if (state.playerStats[stat] !== undefined) {
-      // 限制在 1-10 之间
       state.playerStats[stat] = Math.max(1, Math.min(10, state.playerStats[stat] + delta));
     }
   });
 }
 
-// 根据属性调整胜率
 function calcWinChance(choice) {
   let chance = choice.winChance !== undefined ? choice.winChance : 0.6;
   if (choice.statBonus) {
@@ -615,17 +594,18 @@ function calcWinChance(choice) {
       chance += diff * bonus;
     });
   }
+  if (choice.floatBonus && state.floatedTexts.includes(choice.floatBonus.index)) {
+    chance += choice.floatBonus.bonus;
+  }
   return Math.max(0.05, Math.min(0.95, chance));
 }
 
-// 我的属性面板
 const statsOverlay = document.getElementById('statsOverlay');
 const statsDesc = document.getElementById('statsDesc');
 
 function showStatsPanel() {
   statsDesc.textContent = describePlayer(state.playerStats);
   statsOverlay.style.display = 'flex';
-  // 关掉笔记，防止重叠
   document.getElementById('notebook').style.display = 'none';
   notebookOpen = false;
 }
@@ -637,6 +617,42 @@ document.getElementById('statsClose').onclick = () => {
 statsOverlay.onclick = (e) => {
   if (e.target === statsOverlay) statsOverlay.style.display = 'none';
 };
+
+// ========== 第三轮开场（动态） ==========
+function buildRound3Intro() {
+  const lines = [];
+  lines.push({ type: 'narration', text: '军帐内。油灯快灭了。' });
+
+  if (!state.water) {
+    lines.push({ type: 'speaker', name: '周先生', text: '主将，城里水井干了。今天又有两个士兵为了一瓢水打架，一个被捅伤了。' });
+  } else {
+    lines.push({ type: 'speaker', name: '周先生', text: '主将，存粮只够二十天了。援军……还是没影。' });
+  }
+
+  lines.push({ type: 'speaker', name: '赵将军', text: '那就打出去！给我五千人，我——' });
+  lines.push({ type: 'speaker', name: '周先生', text: '赵将军，B军一万六，你带五千人出去，回得来吗？' });
+  lines.push({ type: 'narration', text: '赵将军噎住了。' });
+  lines.push({ type: 'speaker', name: '副将李', text: '主将……我有个想法，说出来可能不太好听。' });
+  lines.push({ type: 'speaker', name: '周先生', text: '说。' });
+  lines.push({ type: 'speaker', name: '副将李', text: 'B军马副将贪功，看不起韩主将。如果我们假装投降，开西门让他进来验粮……' });
+  lines.push({ type: 'speaker', name: '周先生', text: '你是说，诱敌进城？' });
+  lines.push({ type: 'speaker', name: '副将李', text: '是。' });
+  lines.push({ type: 'speaker', name: '周先生', text: '这步棋走得深。走错一步，城真就没了。' });
+
+  if (state.floatedTexts.includes(0)) {
+    lines.push({ type: 'speaker', name: '周先生', text: '不过……主将，之前士兵传的话，您也听到了。马副将和韩主将面和心不和。若从这里下手，或许有几分把握。' });
+  } else {
+    lines.push({ type: 'speaker', name: '周先生', text: '主将，马副将贪功，韩主将多疑。这两个人，用得好是刀，用不好是祸。' });
+  }
+
+  lines.push({ type: 'speaker', name: '赵将军', text: '那让我去！我带人埋伏，进来一个杀一个！' });
+  lines.push({ type: 'speaker', name: '周先生', text: '赵将军，你埋伏，万一进来的不是马副将，是韩主将呢？' });
+  lines.push({ type: 'speaker', name: '赵将军', text: '那……那也打！' });
+  lines.push({ type: 'speaker', name: '周先生', text: '韩主将带一万六进来，你拿什么打？' });
+  lines.push({ type: 'narration', text: '帐里安静了。' });
+  lines.push({ type: 'thought', text: '现在，你得做决定。' });
+  return lines;
+}
 
 // ========== 数据 ==========
 const gameContent = {
@@ -752,6 +768,57 @@ const gameContent = {
         resultBad: '两千人到了水坝，什么都没发现。B军主力趁机攻城，你兵力更少，南门被撞开一个缺口，丢了一千五百人。',
         effectsGood: { troops: -1200, food: -4 },
         effectsBad: { troops: -1500, food: -4, morale: 1 },
+      },
+    ],
+  },
+
+  round3: {
+    getIntro: buildRound3Intro,
+    choices: [
+      {
+        id: 'A',
+        text: '低声下气派使者谈条件，开西门让马副将进来"验粮"。',
+        betGood: '马副将贪功进城，被你在城内伏击，损兵三千。',
+        betBad: '韩主将识破，亲率主力强攻东门，你损失惨重。',
+        winChance: 0.55,
+        statBonus: { 智谋: 0.04 },
+        floatBonus: { index: 0, bonus: 0.05 },
+        statChanges: { 智谋: 1, 胆识: 1, 统率: -1 },
+        resultGood: '使者进了B营，低头哈腰，把A军说得不堪一击。马副将在帐后听着，嘴角翘了起来。当晚，他带三千人进西门"验粮"。走到街口，两边屋顶火油罐砸下，伏兵杀出。马副将大败，逃出城时只剩一千多。',
+        resultBad: '使者进了B营，话还没说完，韩主将就笑了。他假装答应，让使者回去等消息。第二天夜里，B军主力突然猛攻东门。你的伏兵等来的不是马副将，是韩主将。东门差点破了，你损兵两千。',
+        death: false,
+        effectsGood: { troops: -300, food: -2 },
+        effectsBad: { troops: -2000, food: -4, morale: 1 },
+      },
+      {
+        id: 'B',
+        text: '开城门缝，让B军哨兵看到A军内乱，引诱马副将抢功。',
+        betGood: '马副将看到A军内乱，以为有机可乘，带兵冲进来，中了埋伏。',
+        betBad: '韩主将按住马副将，只派小股部队试探，你白忙一夜。',
+        winChance: 0.55,
+        statBonus: { 果断: 0.04 },
+        floatBonus: { index: 0, bonus: 0.05 },
+        statChanges: { 果断: 1, 威望: 1, 智谋: -1 },
+        resultGood: '你让人把西门打开一条缝，几个士兵在门口推搡、吵架，像在抢东西。B军哨兵看到了，回去报告。马副将在营里坐不住了："A军内乱了！再不抢就没了！"他不等韩主将下令，带兵冲了过来。进了城门，伏兵四起。',
+        resultBad: 'B军哨兵看到了A军门口的乱象，回去报告。韩主将听完，只说了一句："假的。"他按住马副将，只派了两百人试探性攻了一下西门。你的伏兵等了半夜，等来两百人。计谋落了空，士兵白冻了一夜。',
+        death: false,
+        effectsGood: { troops: -500, food: -2 },
+        effectsBad: { troops: -800, food: -3, morale: 1 },
+      },
+      {
+        id: 'C',
+        text: '让赵将军带人假装叛变，开东门引B军进来。',
+        betGood: '马副将大喜，亲自来接收。赵将军趁其不备，拔刀反杀。',
+        betBad: '韩主将看穿赵将军的戏，设下反埋伏。赵将军拼死杀出，损失惨重。',
+        winChance: 0.5,
+        statBonus: { 胆识: 0.04 },
+        floatBonus: { index: 0, bonus: 0.05 },
+        statChanges: { 胆识: 1, 统率: 1, 威望: -1 },
+        resultGood: '赵将军带着几十个亲兵，衣甲不整，跑到B军营前大喊"我等受够了那个庸主，特来投降"。马副将在营里一听，大喜：A军将领都来降了！他亲自带人出来接收。赵将军趁他不备，拔刀就砍。马副将大败，逃回营里。',
+        resultBad: '赵将军带人跑到B军营前请降。韩主将站在营门口，看了一眼赵将军的衣甲，说："衣甲不整，但刀在鞘里没拔。降将哪有刀不离手的？"赵将军被围。他拼死杀出，带去的几十个亲兵只回来三个。你站在城头，看见赵将军满身是血地跑回来，第一句话是："主将，我……我演砸了。"',
+        death: false,
+        effectsGood: { troops: -200, food: -2 },
+        effectsBad: { troops: -1000, food: -3, morale: 1 },
       },
     ],
   },
@@ -882,9 +949,7 @@ function confirmBet(choice) {
   betPanelEl.style.display = 'none';
   betPanelEl.classList.remove('shake');
   setHeartExcited(false);
-  // 应用属性变化
   applyStatChanges(choice.statChanges);
-  // 计算胜率
   const chance = calcWinChance(choice);
   const win = Math.random() < chance;
   showResult(choice, win);
@@ -988,10 +1053,7 @@ document.getElementById('notebookBtn').onclick = () => {
   notebookOpen = !notebookOpen;
   document.getElementById('notebook').style.display = notebookOpen ? 'block' : 'none';
   renderNotebook();
-  if (notebookOpen) {
-    // 关掉属性面板，防止重叠
-    statsOverlay.style.display = 'none';
-  }
+  if (notebookOpen) statsOverlay.style.display = 'none';
 };
 
 function renderNotebook() {
@@ -1054,9 +1116,15 @@ function playRound(roundNum) {
     revealOnBottom(() => {
       showChoices(gameContent.round2.choices);
     });
-  } else {
+  } else if (roundNum === 3) {
+    renderDialogue(gameContent.round3.getIntro());
+    revealOnBottom(() => {
+      showChoices(gameContent.round3.choices);
+    });
+  } else if (roundNum === 4) {
     renderDialogue([
-      { type: 'narration', text: '（第三轮博弈待续——先试玩前两轮机制）' },
+      { type: 'narration', text: 'B军退了几里。但韩主将还在。他还有一万多人，粮草只够几天。他一定会再来。' },
+      { type: 'narration', text: '（第四轮博弈待续——先试玩前三轮机制）' },
     ]);
     scrollHint.style.display = 'none';
   }
