@@ -24,16 +24,22 @@
 
   #startScreen {
     position:fixed; inset:0; z-index:100; display:flex; flex-direction:column;
-    align-items:center; justify-content:center; background:#1a1714; gap:15px;
+    align-items:center; justify-content:center; background:#1a1714; gap:12px;
   }
   #startScreen h1 { font-size:48px; letter-spacing:12px; color:#c9b99a; font-weight:normal; margin-bottom:10px; }
-  #startScreen p { color:#8a7d6b; font-size:16px; margin-bottom:30px; }
+  #startScreen p { color:#8a7d6b; font-size:16px; margin-bottom:10px; }
   .mode-btn {
-    padding:14px 48px; width: 280px; background:transparent; border:1px solid #4a3f32;
+    padding:12px 48px; width: 280px; background:transparent; border:1px solid #4a3f32;
     color:#d4c9b8; font-size:18px; font-family:inherit; cursor:pointer; letter-spacing:4px; transition:all 0.3s;
   }
   .mode-btn:hover { border-color:#8a7d6b; background:#24201a; color:#e8d5a8; }
   .mode-btn .sub { display:block; font-size:12px; color:#6a5a42; letter-spacing:2px; margin-top:6px; }
+  
+  #mobileUiCheckboxWrap {
+    display:flex; align-items:center; gap:8px; margin-top:10px;
+    color:#8a7d6b; font-size:14px; cursor:pointer;
+  }
+  #mobileUiCheckboxWrap input { cursor:pointer; }
 
   #gameScreen { display:none; max-width:820px; margin:0 auto; padding:40px 20px 120px; }
 
@@ -109,16 +115,35 @@
   .notebook-empty { color:#5a4f42; font-style:italic; font-size:13px; }
   .rumor-item { padding:6px 0; border-bottom:1px dotted #332b22; color:#c9a87a; font-size:13px; line-height:1.7; }
 
+  /* ====== 兵法面板默认样式（PC浮窗） ====== */
   #guideOverlay {
     display: none; position: fixed; left: 30px; bottom: 180px; width: 340px; max-height: 60vh; overflow-y: auto;
     background: #2a2218; border: 1px solid #6a5a42; padding: 20px; z-index: 65; font-size: 15px; line-height: 1.8;
     box-shadow: 0 5px 20px rgba(0,0,0,0.8);
+    transition: all 0.3s ease;
   }
   #guideOverlay h3 { color: #e8d5a8; font-size: 18px; margin-bottom: 12px; border-bottom: 1px dotted #4a3f32; padding-bottom: 8px; letter-spacing: 2px; font-weight: normal; }
   #guideOverlay .milestone { color: #c9a87a; font-style: italic; margin-bottom: 10px; }
   #guideOverlay .advice { color: #a89880; margin-bottom: 16px; border-left: 2px solid #8a5a4a; padding-left: 10px; }
   #guideOverlay .highlight { color: #e8b0a0; font-weight: bold; }
 
+  /* ====== 移动端卷轴样式 ====== */
+  #guideBackdrop {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 64;
+  }
+  .mobile-scroll-mode #guideBackdrop { display: none; }
+  .mobile-scroll-mode #guideBackdrop.show { display: block; }
+  .mobile-scroll-mode #guideOverlay {
+    top: 0; left: 0; right: 0; bottom: auto; width: 100%; max-height: 50vh;
+    border-radius: 0 0 15px 15px; border-top: none;
+    transform: translateY(-100%);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.9);
+    background: #2a2218;
+  }
+  .mobile-scroll-mode #guideOverlay.show {
+    transform: translateY(0);
+  }
+  
   .float-text {
     position:fixed; background:rgba(60,20,15,0.92); border:1px solid #8a3a2a; color:#e8c0a0;
     padding:10px 14px; font-size:14px; cursor:pointer; z-index:70; opacity:0; transition:opacity 0.8s; line-height:1.6; max-width:240px;
@@ -232,6 +257,12 @@
   <p>你守的不是一座城，是一万个家。</p>
   <button class="mode-btn" id="startNormalBtn">普通模式<span class="sub">只凭直觉，向死而生</span></button>
   <button class="mode-btn" id="startGuideBtn">引导模式<span class="sub">左侧提供兵法提示</span></button>
+  
+  <label id="mobileUiCheckboxWrap">
+    <input type="checkbox" id="mobileUiCheckbox">
+    启用移动端卷轴界面（默认自动识别手机）
+  </label>
+
   <button class="mode-btn" id="startResumeBtn" style="display:none; border-color:#b85c4a; color:#e8b0a0;">读取存档<span class="sub">继续你未竟的霸业</span></button>
 </div>
 
@@ -245,6 +276,7 @@
 
 <img id="heart" class="calm" src="https://cdn.phototourl.com/member/2026-11-02-36a5566b-457c-4986-b715-dc7cb965661d.png" alt="">
 
+<div id="guideBackdrop"></div>
 <div id="guideOverlay">
   <h3 id="guideTitle">兵法</h3>
   <div id="guideContent"></div>
@@ -435,6 +467,7 @@ function getStatColor(v) {
 let state = {
   phase: 'start',
   isGuided: false,
+  useMobileUI: false,
   heartExcited: false,
   forcedBet: false,
   rethought: false,
@@ -460,14 +493,34 @@ function getStage() {
   return state.phase === 'act1' ? state.act1 : state.camp;
 }
 
-// ========== 界面渲染逻辑 ==========
+// ========== UI 与 渲染逻辑 ==========
 const dialogueEl = document.getElementById('dialogue');
 const choicesEl = document.getElementById('choices');
 const betPanelEl = document.getElementById('betPanel');
 const resultEl = document.getElementById('result');
 const scrollHint = document.getElementById('scrollHint');
 const tutorialTip = document.getElementById('tutorialTip');
+const guideOverlay = document.getElementById('guideOverlay');
+const guideBackdrop = document.getElementById('guideBackdrop');
 let activeRevealHandler = null;
+
+// 自动判断是否为移动端宽度
+function checkAutoMobile() {
+  const cb = document.getElementById('mobileUiCheckbox');
+  if (window.innerWidth <= 768) {
+    cb.checked = true;
+  }
+}
+checkAutoMobile();
+window.addEventListener('resize', checkAutoMobile);
+
+function applyUITheme() {
+  if (state.useMobileUI) {
+    document.body.classList.add('mobile-scroll-mode');
+  } else {
+    document.body.classList.remove('mobile-scroll-mode');
+  }
+}
 
 function renderDialogue(lines) {
   dialogueEl.innerHTML = '';
@@ -731,7 +784,7 @@ document.getElementById('statsBtn').onclick = () => {
   document.getElementById('statsExp').textContent = `经验：${state.exp}　心气：${state.will}`;
   document.getElementById('statsOverlay').style.display = 'flex';
   document.getElementById('notebook').style.display = 'none';
-  document.getElementById('guideOverlay').style.display = 'none';
+  closeGuide();
 };
 
 function spawnFloatTexts() {
@@ -791,15 +844,50 @@ document.getElementById('notebookBtn').onclick = () => {
   renderNotebook();
 };
 
-document.getElementById('guideBtn').onclick = () => {
-  const panel = document.getElementById('guideOverlay');
-  if (panel.style.display === 'block') {
-    panel.style.display = 'none';
+// ========== 兵法 卷轴逻辑 ==========
+function openGuide() {
+  renderGuide();
+  if (state.useMobileUI) {
+    // 卷轴模式
+    guideBackdrop.classList.add('show');
+    guideOverlay.style.display = 'block';
+    // 让浏览器有时间渲染 display:block，再加上滑出动画
+    requestAnimationFrame(() => {
+      guideOverlay.classList.add('show');
+    });
   } else {
-    renderGuide();
-    panel.style.display = 'block';
-    document.getElementById('notebook').style.display = 'none';
+    // 浮窗模式
+    guideOverlay.style.display = 'block';
   }
+  document.getElementById('notebook').style.display = 'none';
+}
+
+function closeGuide() {
+  if (state.useMobileUI) {
+    guideOverlay.classList.remove('show');
+    guideBackdrop.classList.remove('show');
+    // 等待动画结束后隐藏
+    setTimeout(() => {
+      if (!guideOverlay.classList.contains('show')) {
+        guideOverlay.style.display = 'none';
+      }
+    }, 300);
+  } else {
+    guideOverlay.style.display = 'none';
+  }
+}
+
+document.getElementById('guideBtn').onclick = () => {
+  const isShowing = state.useMobileUI ? guideOverlay.classList.contains('show') : guideOverlay.style.display === 'block';
+  if (isShowing) {
+    closeGuide();
+  } else {
+    openGuide();
+  }
+};
+
+guideBackdrop.onclick = () => {
+  closeGuide();
 };
 
 function renderGuide() {
@@ -818,7 +906,7 @@ function renderGuide() {
   document.getElementById('guideContent').innerHTML = html;
 }
 
-// ========== 剧情数据（第一部原封不动） ==========
+// ========== 剧情数据 ==========
 const act1Content = {
   1: {
     intro: [
@@ -867,16 +955,20 @@ const act1Content = {
   },
   3: {
     intro: [
-      { type:'narration', text:'军帐内。油灯快灭了。' },
-      { type:'speaker', name:'副将李', text:'主将……我有个想法，说出来可能不太好听。B军马副将贪功，看不起韩主将。如果我们假装投降，开西门让他进来验粮……' },
-      { type:'speaker', name:'周先生', text:'这步棋走得深。走错一步，城真就没了。' },
-      { type:'speaker', name:'赵将军', text:'那让我去！我带人埋伏，进来一个杀一个！' },
+      { type:'narration', text:'入夜。军帐内。油灯快灭了，火光在每个人脸上跳动。帐外偶尔传来伤兵的哀嚎。' },
+      { type:'speaker', name:'副将李', text:'主将，咱们缺水断粮，死守不是办法。我有个想法，说出来可能不太好听……B军马副将贪功，素来看不起韩主将。若是我们假装投降，开西门让他进来“验粮”呢？' },
+      { type:'speaker', name:'周先生', text:'李将军，这步棋走得太深了。马副将虽然贪，但韩主将却是个多疑的狐狸。万一他顺水推舟，将计就计，趁我们开城门的时候强行掩杀，这城真就没了。' },
+      { type:'speaker', name:'赵将军', text:'军师！这也不行，那也不行，难道等死吗？！让我带人埋伏在城门洞里，管他来的是马副将还是韩主将，进来一个我杀一个！' },
+      { type:'speaker', name:'周先生', text:'赵将军，若韩主将带主力涌入，你拿什么挡？' },
+      { type:'speaker', name:'老陈', text:'主将，今日探马回报，B军营中似有怨言，这马副将确实与韩主将走得生分。若我们动静做得逼真，他极可能抢功而入。' },
+      { type:'speaker', name:'副将李', text:'老陈说得对。只要引他入城，巷战之中B军施展不开，我们尚有胜算。但这诱饵怎么抛，还得主将定夺。' },
+      { type:'narration', text:'你看着桌上那份虚构的“请降书”。开门，可能是生机，也可能是全城人的死期。' },
       { type:'thought', text:'现在，你得做决定。' },
     ],
     choices: [
-      { id:'A', text:'低声下气派使者谈条件，开西门让马副将进来"验粮"。', betGood:'马副将贪功进城，被你在城内伏击，损兵三千。', betBad:'韩主将识破，亲率主力强攻东门，你损失惨重。', winChance:0.55, statBonus:{ 智谋:0.04 }, floatBonus:{ index:0, bonus:0.05 }, statChanges:{ 智谋:1, 胆识:1, 统率:-1 }, resultGood:'使者进了B营，低头哈腰，把A军说得不堪一击。马副将在帐后听着，嘴角翘了起来。当晚，他带三千人进西门"验粮"。走到街口，两边屋顶火油罐砸下，伏兵杀出。马副将大败，逃出城时只剩一千多。', resultBad:'使者进了B营，话还没说完，韩主将就笑了。他假装答应，让使者回去等消息。第二天夜里，B军主力突然猛攻东门。你的伏兵等来的不是马副将，是韩主将。东门差点破了，你损兵两千。', death:false, effectsGood:{ troops:-300, food:-2 }, effectsBad:{ troops:-2000, food:-4, morale:1 } },
-      { id:'B', text:'开城门缝，让B军哨兵看到A军内乱，引诱马副将抢功。', betGood:'马副将看到A军内乱，以为有机可乘，带兵冲进来，中了埋伏。', betBad:'韩主将按住马副将，只派小股部队试探，你白忙一夜。', winChance:0.55, statBonus:{ 果断:0.04 }, floatBonus:{ index:0, bonus:0.05 }, statChanges:{ 果断:1, 威望:1, 智谋:-1 }, resultGood:'你让人把西门打开一条缝，几个士兵在门口推搡、吵架，像在抢东西。B军哨兵看到了，回去报告。马副将在营里坐不住了："A军内乱了！再不抢就没了！"他不等韩主将下令，带兵冲了过来。进了城门，伏兵四起。', resultBad:'B军哨兵看到了A军门口的乱象，回去报告。韩主将听完，只说了一句："假的。"他按住马副将，只派了两百人试探性攻了一下西门。你的伏兵等了半夜，等来两百人。计谋落了空，士兵白冻了一夜。', death:false, effectsGood:{ troops:-500, food:-2 }, effectsBad:{ troops:-800, food:-3, morale:1 } },
-      { id:'C', text:'让赵将军带人假装叛变，开东门引B军进来。', betGood:'马副将大喜，亲自来接收。赵将军趁其不备，拔刀反杀。', betBad:'韩主将看穿赵将军的戏，设下反埋伏。赵将军拼死杀出，损失惨重。', winChance:0.5, statBonus:{ 胆识:0.04 }, floatBonus:{ index:0, bonus:0.05 }, statChanges:{ 胆识:1, 统率:1, 威望:-1 }, resultGood:'赵将军带着几十个亲兵，衣甲不整，跑到B军营前大喊"我等受够了那个庸主，特来投降"。马副将在营里一听，大喜：A军将领都来降了！他亲自带人出来接收。赵将军趁他不备，拔刀就砍。马副将大败，逃回营里。', resultBad:'赵将军带人跑到B军营前请降。韩主将站在营门口，看了一眼赵将军的衣甲，说："衣甲不整，但刀在鞘里没拔。降将哪有刀不离手的？"赵将军被围。他拼死杀出，带去的几十个亲兵只回来三个。你站在城头，看见赵将军满身是血地跑回来，第一句话是："主将，我……我演砸了。"', death:false, effectsGood:{ troops:-200, food:-2 }, effectsBad:{ troops:-1000, food:-3, morale:1 } }
+      { id:'A', text:'派使者低声下气去谈，开西门让马副将进来“验粮”。', betGood:'马副将贪功进城，被你在城内伏击，损兵三千。', betBad:'韩主将识破，亲率主力强攻东门，你损失惨重。', winChance:0.55, statBonus:{ 智谋:0.04 }, floatBonus:{ index:0, bonus:0.05 }, statChanges:{ 智谋:1, 胆识:1, 统率:-1 }, resultGood:'使者进了B营，低头哈腰，把A军说得不堪一击。马副将在帐后听着，嘴角翘了起来。当晚，他带三千人进西门"验粮"。走到街口，两边屋顶火油罐砸下，伏兵杀出。马副将大败，逃出城时只剩一千多。', resultBad:'使者进了B营，话还没说完，韩主将就笑了。他假装答应，让使者回去等消息。第二天夜里，B军主力突然猛攻东门。你的伏兵等来的不是马副将，是韩主将。东门差点破了，你损兵两千。', death:false, effectsGood:{ troops:-300, food:-2 }, effectsBad:{ troops:-2000, food:-4, morale:1 } },
+      { id:'B', text:'开城门缝，让B军哨兵看到城内乱象，引马副将抢功。', betGood:'马副将看到A军内乱，以为有机可乘，带兵冲进来，中了埋伏。', betBad:'韩主将按住马副将，只派小股部队试探，你白忙一夜。', winChance:0.55, statBonus:{ 果断:0.04 }, floatBonus:{ index:0, bonus:0.05 }, statChanges:{ 果断:1, 威望:1, 智谋:-1 }, resultGood:'你让人把西门打开一条缝，几个士兵在门口推搡、吵架，像在抢东西。B军哨兵看到了，回去报告。马副将在营里坐不住了："A军内乱了！再不抢就没了！"他不等韩主将下令，带兵冲了过来。进了城门，伏兵四起。', resultBad:'B军哨兵看到了A军门口的乱象，回去报告。韩主将听完，只说了一句："假的。"他按住马副将，只派了两百人试探性攻了一下西门。你的伏兵等了半夜，等来两百人。计谋落了空，士兵白冻了一夜。', death:false, effectsGood:{ troops:-500, food:-2 }, effectsBad:{ troops:-800, food:-3, morale:1 } },
+      { id:'C', text:'让赵将军带人假装叛变，直接开东门引B军进来。', betGood:'马副将大喜，亲自来接收。赵将军趁其不备，拔刀反杀。', betBad:'韩主将看穿赵将军的戏，设下反埋伏。赵将军拼死杀出，损失惨重。', winChance:0.5, statBonus:{ 胆识:0.04 }, floatBonus:{ index:0, bonus:0.05 }, statChanges:{ 胆识:1, 统率:1, 威望:-1 }, resultGood:'赵将军带着几十个亲兵，衣甲不整，跑到B军营前大喊"我等受够了那个庸主，特来投降"。马副将在营里一听，大喜：A军将领都来降了！他亲自带人出来接收。赵将军趁他不备，拔刀就砍。马副将大败，逃回营里。', resultBad:'赵将军带人跑到B军营前请降。韩主将站在营门口，看了一眼赵将军的衣甲，说："衣甲不整，但刀在鞘里没拔。降将哪有刀不离手的？"赵将军被围。他拼死杀出，带去的几十个亲兵只回来三个。你站在城头，看见赵将军满身是血地跑回来，第一句话是："主将，我……我演砸了。"', death:false, effectsGood:{ troops:-200, food:-2 }, effectsBad:{ troops:-1000, food:-3, morale:1 } }
     ]
   },
   4: {
@@ -913,7 +1005,7 @@ const act1Content = {
   }
 };
 
-// ========== 剧情数据（第二部：追击战精修版） ==========
+// ========== 剧情数据（第二部：追击战） ==========
 const campaignContent = {
   'chase': {
     name: '追击战：穷寇莫追',
@@ -978,7 +1070,7 @@ function playRound(roundNum) {
   stage.currentRound = roundNum;
   state.forcedBet = false;
   state.rethought = false;
-  syncGuideBtn(); // 确保进入每一轮都同步按钮状态
+  syncGuideBtn(); 
 
   let data;
   if (state.phase === 'act1') data = act1Content[roundNum];
@@ -1030,6 +1122,7 @@ function triggerEnding(forced = '') {
       document.getElementById('endingOverlay').style.display = 'none';
       state.phase = 'interlude';
       
+      // 第一幕结束，直接恢复所有状态
       state.act1 = initStage(); 
       clearRedVignette();
 
@@ -1051,6 +1144,7 @@ function triggerEnding(forced = '') {
         document.getElementById('endingOverlay').style.display = 'none';
         state.phase = 'interlude';
         
+        // 战役结束，恢复所有状态
         state.camp = initStage();
         clearRedVignette();
 
@@ -1064,7 +1158,7 @@ function triggerEnding(forced = '') {
 
 function openInterlude() {
   clearRedVignette();
-  syncGuideBtn(); // 确保休整时按钮状态正确
+  syncGuideBtn(); 
   document.getElementById('interludeOverlay').style.display = 'flex';
   document.getElementById('intExp').textContent = `经验：${state.exp}　心气：${state.will}`;
   
@@ -1100,7 +1194,7 @@ function startCampaign(key) {
   
   state.camp = initStage();
   clearRedVignette();
-  syncGuideBtn(); // 开启新战役时，保证兵法按钮在
+  syncGuideBtn();
   
   playRound(1);
 }
@@ -1118,7 +1212,8 @@ document.getElementById('loadBtn').onclick = () => {
     document.getElementById('startScreen').style.display = 'none';
     document.getElementById('gameScreen').style.display = 'block';
     
-    syncGuideBtn(); // 读档时恢复按钮
+    applyUITheme();
+    syncGuideBtn(); 
 
     if (state.phase === 'interlude') {
       openInterlude();
@@ -1131,9 +1226,12 @@ document.getElementById('loadBtn').onclick = () => {
 };
 
 // ========== 启动逻辑 ==========
-document.getElementById('startNormalBtn').onclick = () => {
+function initGame(isGuided) {
+  state.isGuided = isGuided;
+  state.useMobileUI = document.getElementById('mobileUiCheckbox').checked;
+  applyUITheme();
+  
   state.phase = 'act1';
-  state.isGuided = false;
   state.act1 = initStage();
   document.getElementById('startScreen').style.display = 'none';
   document.getElementById('gameScreen').style.display = 'block';
@@ -1141,19 +1239,10 @@ document.getElementById('startNormalBtn').onclick = () => {
   startBgm();
   requestAnimationFrame(checkTicks);
   playRound(1);
-};
+}
 
-document.getElementById('startGuideBtn').onclick = () => {
-  state.phase = 'act1';
-  state.isGuided = true;
-  state.act1 = initStage();
-  document.getElementById('startScreen').style.display = 'none';
-  document.getElementById('gameScreen').style.display = 'block';
-  syncGuideBtn();
-  startBgm();
-  requestAnimationFrame(checkTicks);
-  playRound(1);
-};
+document.getElementById('startNormalBtn').onclick = () => initGame(false);
+document.getElementById('startGuideBtn').onclick = () => initGame(true);
 
 document.getElementById('startResumeBtn').onclick = () => {
   document.getElementById('loadBtn').click();
