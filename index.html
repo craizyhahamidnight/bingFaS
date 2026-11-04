@@ -35,7 +35,6 @@
   .mode-btn:hover { border-color:#8a7d6b; background:#24201a; color:#e8d5a8; }
   .mode-btn .sub { display:block; font-size:12px; color:#6a5a42; letter-spacing:2px; margin-top:6px; }
   
-  /* 恢复移动端勾选框 */
   #mobileUiCheckboxWrap {
     display:flex; align-items:center; gap:8px; margin-top:10px;
     color:#8a7d6b; font-size:14px; cursor:pointer;
@@ -96,6 +95,20 @@
   #statsBtn { bottom:70px; }
   #notebookBtn:hover, #statsBtn:hover { border-color:#8a7d6b; }
 
+  /* ====== 军帐笔记（补回了被误删的样式） ====== */
+  #notebook {
+    display:none; position:fixed; right:20px; bottom:70px; width:320px; max-height:450px; overflow-y:auto;
+    background:#1f1a14; border:1px solid #4a3f32; padding:18px; z-index:60; font-size:14px; line-height:1.8;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.8);
+  }
+  #notebook h3 { color:#e8d5a8; font-size:16px; margin-bottom:8px; }
+  #notebook h4 { color:#c9a87a; font-size:14px; margin:12px 0 6px; letter-spacing:2px; }
+  #notebook table { width:100%; border-collapse:collapse; margin-bottom:8px; }
+  #notebook td { padding:4px 0; border-bottom:1px dotted #332b22; vertical-align:top; }
+  #notebook td:first-child { color:#8a7d6b; width:38%; }
+  .notebook-empty { color:#5a4f42; font-style:italic; font-size:13px; }
+  .rumor-item { padding:6px 0; border-bottom:1px dotted #332b22; color:#c9a87a; font-size:13px; line-height:1.7; }
+
   /* ====== 兵法面板 默认（PC） ====== */
   #guideBtn {
     display: none; position: fixed; left: 30px; bottom: 130px;
@@ -115,8 +128,6 @@
   }
   #guideToggleBtn:hover { background: #4a3f32; color: #e8d5a8; }
 
-  /* 移除了遮罩，完全透明背景 */
-  
   #guideOverlay {
     display: none; position: fixed; left: 30px; bottom: 180px; width: 340px; max-height: 50vh; overflow-y: auto;
     background: #2a2218; border: 1px solid #6a5a42; padding: 20px; z-index: 65; font-size: 15px; line-height: 1.8;
@@ -284,6 +295,7 @@
 <button id="statsBtn">我的属性</button>
 <button id="notebookBtn">军帐笔记</button>
 
+<!-- 军帐笔记面板 -->
 <div id="notebook">
   <h3>军帐笔记</h3>
   <h4>军情</h4>
@@ -491,7 +503,7 @@ function getStage() {
   return state.phase === 'act1' ? state.act1 : state.camp;
 }
 
-// ========== UI 与 渲染逻辑 ==========
+// ========== 界面渲染逻辑 ==========
 const dialogueEl = document.getElementById('dialogue');
 const choicesEl = document.getElementById('choices');
 const betPanelEl = document.getElementById('betPanel');
@@ -894,7 +906,7 @@ guideToggleBtn.onclick = () => {
   }
 };
 
-// 全局点击关闭逻辑（屏蔽了遮罩后，点别处也能关）
+// 全局点击关闭逻辑
 document.addEventListener('click', (e) => {
   const isShowing = state.useMobileUI ? guideOverlay.classList.contains('show') : guideOverlay.style.display === 'block';
   if (isShowing) {
