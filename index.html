@@ -95,6 +95,7 @@
   #statsBtn { bottom:70px; }
   #notebookBtn:hover, #statsBtn:hover { border-color:#8a7d6b; }
 
+  /* ====== 兵法面板 默认（PC） ====== */
   #guideBtn {
     display: none; position: fixed; left: 30px; bottom: 130px;
     background: rgba(60, 50, 40, 0.8); border: 1px solid #8a7d6b;
@@ -103,46 +104,42 @@
   }
   #guideBtn:hover { background: #4a3f32; }
 
-  #notebook {
-    display:none; position:fixed; right:20px; bottom:70px; width:320px; max-height:450px; overflow-y:auto;
-    background:#1f1a14; border:1px solid #4a3f32; padding:18px; z-index:60; font-size:14px; line-height:1.8;
+  #guideToggleBtn {
+    display: none; position: fixed; top: 0; left: 50%; transform: translateX(-50%);
+    background: rgba(31,26,20,0.9); border: 1px solid #6a5a42; border-top: none;
+    color: #8a7d6b; padding: 6px 24px; border-radius: 0 0 10px 10px;
+    font-family: inherit; font-size: 14px; cursor: pointer; z-index: 100;
+    letter-spacing: 2px; transition: all 0.3s;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
   }
-  #notebook h3 { color:#e8d5a8; font-size:16px; margin-bottom:8px; }
-  #notebook h4 { color:#c9a87a; font-size:14px; margin:12px 0 6px; letter-spacing:2px; }
-  #notebook table { width:100%; border-collapse:collapse; margin-bottom:8px; }
-  #notebook td { padding:4px 0; border-bottom:1px dotted #332b22; vertical-align:top; }
-  #notebook td:first-child { color:#8a7d6b; width:38%; }
-  .notebook-empty { color:#5a4f42; font-style:italic; font-size:13px; }
-  .rumor-item { padding:6px 0; border-bottom:1px dotted #332b22; color:#c9a87a; font-size:13px; line-height:1.7; }
+  #guideToggleBtn:hover { background: #4a3f32; color: #e8d5a8; }
 
-  /* ====== 兵法面板默认样式（PC浮窗） ====== */
+  #guideBackdrop {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 98;
+  }
+  #guideBackdrop.show { display: block; }
+
   #guideOverlay {
     display: none; position: fixed; left: 30px; bottom: 180px; width: 340px; max-height: 60vh; overflow-y: auto;
     background: #2a2218; border: 1px solid #6a5a42; padding: 20px; z-index: 65; font-size: 15px; line-height: 1.8;
     box-shadow: 0 5px 20px rgba(0,0,0,0.8);
-    transition: all 0.3s ease;
   }
   #guideOverlay h3 { color: #e8d5a8; font-size: 18px; margin-bottom: 12px; border-bottom: 1px dotted #4a3f32; padding-bottom: 8px; letter-spacing: 2px; font-weight: normal; }
   #guideOverlay .milestone { color: #c9a87a; font-style: italic; margin-bottom: 10px; }
   #guideOverlay .advice { color: #a89880; margin-bottom: 16px; border-left: 2px solid #8a5a4a; padding-left: 10px; }
   #guideOverlay .highlight { color: #e8b0a0; font-weight: bold; }
 
-  /* ====== 移动端卷轴样式 ====== */
-  #guideBackdrop {
-    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 64;
-  }
-  .mobile-scroll-mode #guideBackdrop { display: none; }
-  .mobile-scroll-mode #guideBackdrop.show { display: block; }
-  .mobile-scroll-mode #guideOverlay {
-    top: 0; left: 0; right: 0; bottom: auto; width: 100%; max-height: 50vh;
+  /* ====== 移动端样式覆盖 ====== */
+  body.mobile-ui #guideBtn { display: none !important; }
+  body.mobile-ui #guideToggleBtn { display: block; }
+  body.mobile-ui #guideOverlay {
+    display: block; position: fixed; top: 0; left: 0; right: 0; bottom: auto; width: 100%; max-height: 50vh;
     border-radius: 0 0 15px 15px; border-top: none;
     transform: translateY(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 10px 30px rgba(0,0,0,0.9);
-    background: #2a2218;
   }
-  .mobile-scroll-mode #guideOverlay.show {
-    transform: translateY(0);
-  }
+  body.mobile-ui #guideOverlay.show { transform: translateY(0); }
   
   .float-text {
     position:fixed; background:rgba(60,20,15,0.92); border:1px solid #8a3a2a; color:#e8c0a0;
@@ -256,7 +253,7 @@
   <h1>青石城</h1>
   <p>你守的不是一座城，是一万个家。</p>
   <button class="mode-btn" id="startNormalBtn">普通模式<span class="sub">只凭直觉，向死而生</span></button>
-  <button class="mode-btn" id="startGuideBtn">引导模式<span class="sub">左侧提供兵法提示</span></button>
+  <button class="mode-btn" id="startGuideBtn">引导模式<span class="sub">兵法提示</span></button>
   
   <label id="mobileUiCheckboxWrap">
     <input type="checkbox" id="mobileUiCheckbox">
@@ -276,13 +273,16 @@
 
 <img id="heart" class="calm" src="https://cdn.phototourl.com/member/2026-11-02-36a5566b-457c-4986-b715-dc7cb965661d.png" alt="">
 
+<!-- PC端按钮 & 顶部卷轴按钮 -->
+<button id="guideBtn">兵法</button>
+<button id="guideToggleBtn">﹀ 兵法 ﹀</button>
+
 <div id="guideBackdrop"></div>
 <div id="guideOverlay">
   <h3 id="guideTitle">兵法</h3>
   <div id="guideContent"></div>
 </div>
 
-<button id="guideBtn">兵法</button>
 <button id="statsBtn">我的属性</button>
 <button id="notebookBtn">军帐笔记</button>
 
@@ -502,9 +502,10 @@ const scrollHint = document.getElementById('scrollHint');
 const tutorialTip = document.getElementById('tutorialTip');
 const guideOverlay = document.getElementById('guideOverlay');
 const guideBackdrop = document.getElementById('guideBackdrop');
+const guideBtn = document.getElementById('guideBtn');
+const guideToggleBtn = document.getElementById('guideToggleBtn');
 let activeRevealHandler = null;
 
-// 自动判断是否为移动端宽度
 function checkAutoMobile() {
   const cb = document.getElementById('mobileUiCheckbox');
   if (window.innerWidth <= 768) {
@@ -516,9 +517,9 @@ window.addEventListener('resize', checkAutoMobile);
 
 function applyUITheme() {
   if (state.useMobileUI) {
-    document.body.classList.add('mobile-scroll-mode');
+    document.body.classList.add('mobile-ui');
   } else {
-    document.body.classList.remove('mobile-scroll-mode');
+    document.body.classList.remove('mobile-ui');
   }
 }
 
@@ -754,12 +755,19 @@ function clearRedVignette() {
   document.body.classList.remove('warning', 'danger');
 }
 
-// 统一控制兵法按钮的显示
+// 统一控制兵法按钮的显示 (PC和移动端)
 function syncGuideBtn() {
   if (state.isGuided) {
-    document.getElementById('guideBtn').style.display = 'block';
+    if (state.useMobileUI) {
+      guideBtn.style.display = 'none';
+      guideToggleBtn.style.display = 'block';
+    } else {
+      guideBtn.style.display = 'block';
+      guideToggleBtn.style.display = 'none';
+    }
   } else {
-    document.getElementById('guideBtn').style.display = 'none';
+    guideBtn.style.display = 'none';
+    guideToggleBtn.style.display = 'none';
   }
 }
 
@@ -848,15 +856,12 @@ document.getElementById('notebookBtn').onclick = () => {
 function openGuide() {
   renderGuide();
   if (state.useMobileUI) {
-    // 卷轴模式
     guideBackdrop.classList.add('show');
-    guideOverlay.style.display = 'block';
-    // 让浏览器有时间渲染 display:block，再加上滑出动画
     requestAnimationFrame(() => {
       guideOverlay.classList.add('show');
     });
+    guideToggleBtn.textContent = '︿ 收起兵法 ︿';
   } else {
-    // 浮窗模式
     guideOverlay.style.display = 'block';
   }
   document.getElementById('notebook').style.display = 'none';
@@ -866,20 +871,22 @@ function closeGuide() {
   if (state.useMobileUI) {
     guideOverlay.classList.remove('show');
     guideBackdrop.classList.remove('show');
-    // 等待动画结束后隐藏
-    setTimeout(() => {
-      if (!guideOverlay.classList.contains('show')) {
-        guideOverlay.style.display = 'none';
-      }
-    }, 300);
+    guideToggleBtn.textContent = '﹀ 兵法 ﹀';
   } else {
     guideOverlay.style.display = 'none';
   }
 }
 
-document.getElementById('guideBtn').onclick = () => {
-  const isShowing = state.useMobileUI ? guideOverlay.classList.contains('show') : guideOverlay.style.display === 'block';
-  if (isShowing) {
+guideBtn.onclick = () => {
+  if (guideOverlay.style.display === 'block') {
+    closeGuide();
+  } else {
+    openGuide();
+  }
+};
+
+guideToggleBtn.onclick = () => {
+  if (guideOverlay.classList.contains('show')) {
     closeGuide();
   } else {
     openGuide();
@@ -1122,7 +1129,6 @@ function triggerEnding(forced = '') {
       document.getElementById('endingOverlay').style.display = 'none';
       state.phase = 'interlude';
       
-      // 第一幕结束，直接恢复所有状态
       state.act1 = initStage(); 
       clearRedVignette();
 
@@ -1144,7 +1150,6 @@ function triggerEnding(forced = '') {
         document.getElementById('endingOverlay').style.display = 'none';
         state.phase = 'interlude';
         
-        // 战役结束，恢复所有状态
         state.camp = initStage();
         clearRedVignette();
 
